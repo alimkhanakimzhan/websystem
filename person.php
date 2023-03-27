@@ -72,7 +72,11 @@ require_once "config.php";
 
 
           if($search_field_parameter =='' AND $firstName_request =='' AND  $lastName_request =='' AND $patronymic_request ==''){
-            if($query = $db->prepare("SELECT person.id, IIN, FirstName, LastName, Patronymic, Photo, Gender.Gender, BirthDate, regions_list.name as PlaceOfBirth, nationality_list.nationality as nationality FROM person INNER JOIN Gender ON Gender.id = person.Gender INNER JOIN regions_list ON regions_list.id = person.PlaceOfBirth INNER JOIN nationality_list ON nationality_list.id = person.Nationality ORDER BY `person`.`id` ASC LIMIT 50; ")) {
+            if($query = $db->prepare("SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as nationality 
+            FROM persons INNER JOIN gender ON gender.id = persons.GenderID 
+            INNER JOIN regions ON regions.id = persons.birth_region_id 
+            INNER JOIN nationalities ON nationalities.id = persons.nationality_id 
+            ORDER BY `persons`.`ID` ASC LIMIT 50; ")) {
 
               $query->execute();
               $result = $query->get_result();
@@ -99,7 +103,7 @@ require_once "config.php";
                     $Patronymic = $row["Patronymic"];
                     $BirthDate = $row["BirthDate"];
                     $PlaceOfBirth = $row["PlaceOfBirth"];
-                    $Photo = $row["Photo"];
+                    $Photo = 'images/avatars/persons/' . $row["Photo"];
 
                     echo '
 
@@ -135,7 +139,7 @@ require_once "config.php";
             }
 
           } else {
-          $query = "SELECT person.id, IIN, FirstName, LastName, Patronymic, Photo, Gender.Gender, BirthDate, regions_list.name as PlaceOfBirth, nationality_list.nationality as nationality FROM person INNER JOIN Gender ON Gender.id = person.Gender INNER JOIN regions_list ON regions_list.id = person.PlaceOfBirth INNER JOIN nationality_list ON nationality_list.id = person.Nationality WHERE ";
+          $query = "SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, Gender.Gender, BirthDate, regions_list.name as PlaceOfBirth, nationality_list.nationality as nationality FROM person INNER JOIN Gender ON Gender.id = person.Gender INNER JOIN regions_list ON regions_list.id = person.PlaceOfBirth INNER JOIN nationality_list ON nationality_list.id = person.Nationality WHERE ";
 
 
           if($search_field_parameter !=''){

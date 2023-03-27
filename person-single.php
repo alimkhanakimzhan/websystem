@@ -16,7 +16,11 @@ if(!isset($_GET['id'])) {
   $id = $_GET['id'];
 
 
-  if($query = $db->prepare("SELECT person.id, IIN, FirstName, LastName, Patronymic,Photo, Gender.Gender, BirthDate, regions_list.name as PlaceOfBirth, nationality_list.nationality as Nationality FROM person INNER JOIN Gender ON Gender.id = person.Gender INNER JOIN regions_list ON regions_list.id = person.PlaceOfBirth INNER JOIN nationality_list ON nationality_list.id = person.Nationality WHERE person.id = $id ORDER BY `person`.`id` ASC LIMIT 5")) {
+  if($query = $db->prepare("SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name as Gender, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as Nationality 
+  FROM persons INNER JOIN gender ON gender.id = persons.GenderID 
+  INNER JOIN regions ON regions.id = persons.birth_region_id 
+  INNER JOIN nationalities ON nationalities.id = persons.nationality_id 
+  WHERE persons.id = $id ORDER BY `persons`.`id` ASC LIMIT 5")) {
 
     $query->execute();
     $result = $query->get_result();
@@ -30,7 +34,7 @@ if(!isset($_GET['id'])) {
                   $BirthDate = $row['BirthDate'];
                   $PlaceOfBirth = $row['PlaceOfBirth'];
                   $Nationality = $row['Nationality'];
-                  $Photo = $row["Photo"];
+                  $Photo = 'images/avatars/persons/' . $row["Photo"];
                 }
                }
             }
@@ -82,8 +86,8 @@ if(!isset($_GET['id'])) {
                     <h4 class="text-right">Текущая работа</h4>
                 </div>
                 <?php
-                if($query = $db->prepare("SELECT time_start_position, time_end_position,  position_name, organizations_list.Name as organization_name FROM `job_history` INNER JOIN person on person.id=job_history.person_id
-                                          INNER JOIN organizations_list on organization_ID=organizations_list.id
+                if($query = $db->prepare("SELECT time_start_position, time_end_position,  position_name, organization_list.name as organization_name FROM `job_history` INNER JOIN persons on persons.id=job_history.person_id
+                                          INNER JOIN organization_list on organization_ID=organization_list.id
                                           WHERE person_id = $id and time_end_position = '0000-00-00 00:00' ORDER BY time_start_position DESC")) {
 
                   $query->execute();
@@ -130,7 +134,11 @@ if(!isset($_GET['id'])) {
 
       <div class="row mt-3">
           <?php
-          if($query = $db->prepare("SELECT relatives.full_name, relatives.relative_id, relationship_type.Name FROM person INNER JOIN relatives ON relatives.person_id = person.id INNER JOIN relationship_type ON relatives.relationship_type = relationship_type.id WHERE person_id =$id")) {
+          if($query = $db->prepare("SELECT b.FirstName as full_name, relative_id, relationship_type.Name 
+          FROM persons a INNER JOIN relatives ON relatives.person_id = a.id 
+          INNER JOIN persons b ON b.id = relatives.relative_id 
+          INNER JOIN relationship_type ON relatives.relationship_id = relationship_type.id 
+          WHERE person_id =$id")) {
 
             $query->execute();
             $result = $query->get_result();
@@ -185,7 +193,10 @@ if(!isset($_GET['id'])) {
 
       </div>
      </div>
+     <div class="container rounded bg-white mt-5 mb-5">
+       <div id="network"></div>
 
+     </div>
      <hr>
 
      <div class="container rounded bg-white mt-5 mb-5">
@@ -194,8 +205,8 @@ if(!isset($_GET['id'])) {
       </div>
 
       <?php
-      if($query = $db->prepare("SELECT time_start_position, time_end_position,  position_name, organization_ID, organizations_list.Name as organization_name FROM `job_history` INNER JOIN person on person.id=job_history.person_id
-                                INNER JOIN organizations_list on organization_ID=organizations_list.id
+      if($query = $db->prepare("SELECT time_start_position, time_end_position,  position_name, organization_ID, organization_list.Name as organization_name FROM `job_history` INNER JOIN persons on persons.id=job_history.person_id
+                                INNER JOIN organization_list on organization_ID=organization_list.id
                                 WHERE person_id = $id ORDER BY time_start_position DESC")) {
 
         $query->execute();
@@ -231,6 +242,8 @@ if(!isset($_GET['id'])) {
       ?>
       </div>
     </div>
+
+  
 
     <?php
     $page = "person_page";
