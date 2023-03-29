@@ -32,10 +32,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submit'])) {
                         session_start();
                         $_SESSION["loggedin"] = true;
                         $_SESSION["user"] = $row;
+                        $_SESSION["role"] = $row['role'];
                         $_SESSION["nickname"] = $row['nickname'];
 
                         // Redirect the user to welcome page
-                        header("Location:  index.php");
+                        if ($_SESSION['role'] == 1){
+                          header("location: admin/index.php");
+                        }
+                        else {
+                          header("location: index.php");
+                        }
                         exit;
                       }
                       else {
