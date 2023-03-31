@@ -1,7 +1,6 @@
 <?php
 // start the session
 session_start();
-
 // Check if the user is not logged in, then redirect the user to login page
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
@@ -9,62 +8,55 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 }
 
 require_once "config.php";
-
 ?>
+
 <html>
   <?php require_once(HOME_DIR.'/include/header.php') ?>
   <body>
     <div class="wrapper" style="">
-
-            <div class="container rounded bg-white mt-5 mb-5">
-
-
-<!-- search form start-->
-              <form class="container mt-5" action="person.php" method="GET">
-                      <div class="row d-flex justify-content-center">
-                          <div class="col-md-10">
-                              <div class="card p-3  py-4">
-                                  <h5>Поиск гражданина:</h5>
-                                  <div class="row g-3 mt-2">
-                                      <div class="col-md-9">
-                                          <input name="search-field" type="text" class="form-control" placeholder="Введите ИИН, пример: 010203040506">
-                                      </div>
-                                      <div class="col-md-3">
-                                          <button class="btn btn-secondary btn-block">Найти</button>
-                                      </div>
-                                  </div>
-                                <div class="mt-3">
-                                  <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample" class="advanced">
-                                    Дополнительные параметры <i class="fa fa-angle-down"></i>
-                                  </a>
-                                  <div class="collapse" id="collapseExample">
-                                    <div class="card card-body">
-                                      <div class="row">
-                                          <div class="col-md-4">
-                                              <input type="text" class="form-control" placeholder="Имя" name="FirstName">
-                                          </div>
-                                          <div class="col-md-4">
-                                              <input type="text" class="form-control" placeholder="Фамилия" name="LastName">
-                                          </div>
-                                          <div class="col-md-4">
-                                              <input type="text" class="form-control" placeholder="Отчество" name="Patronymic">
-                                          </div>
-                                      </div>
-                                    </div>
-                                  </div>
-                                </div>
-                            </div>
-                          </div>
+        <div class="container rounded bg-white mt-5 mb-5">
+          <!-- search form start-->
+          <form class="container mt-5" action="person.php" method="GET">
+            <div class="row d-flex justify-content-center">
+              <div class="col-md-10">
+                <div class="card p-3  py-4">
+                  <h5>Поиск гражданина:</h5>
+                    <div class="row g-3 mt-2">
+                      <div class="col-md-9">
+                        <input name="search-field" type="text" class="form-control" placeholder="Введите ИИН, пример: 010203040506">
                       </div>
-                    </form>
-<!-- search form end-->
+                      <div class="col-md-3">
+                        <button class="btn btn-secondary btn-block">Найти</button>
+                      </div>
+                    </div>
+                    <div class="mt-3">
+                      <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" 
+                        aria-controls="collapseExample" 
+                        class="advanced"> Дополнительные параметры <i class="fa fa-angle-down"></i>
+                      </a>
+                    <div class="collapse" id="collapseExample">
+                      <div class="card card-body">
+                        <div class="row">
+                          <div class="col-md-4">
+                            <input type="text" class="form-control" placeholder="Имя" name="FirstName">
+                          </div>
+                          <div class="col-md-4">
+                            <input type="text" class="form-control" placeholder="Фамилия" name="LastName">
+                          </div>
+                          <div class="col-md-4">
+                            <input type="text" class="form-control" placeholder="Отчество" name="Patronymic">
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+          <!-- search form end-->
 
-
-
-
-      <?php
-
-
+        <?php
           $search_field_parameter = isset($_GET['search-field']) ? $_GET['search-field'] : '';
           $firstName_request = isset($_GET['FirstName']) ? $_GET['FirstName'] : '';
           $lastName_request = isset($_GET['LastName']) ? $_GET['LastName'] : '';
@@ -226,30 +218,16 @@ require_once "config.php";
               <p class="text-center">
               Ничего не найдено!
               </p>
-
               ';
             }
-
           }
-
           }
-
-
-
-
-
-      ?>
-
-  </table>
-
-
-
-
-  </div>
-    </div>
-        <?php
-        $page = "person_page";
-        require_once(HOME_DIR.'/include/navmenu.php');
         ?>
-      </body>
-    </html>
+        </table>
+      </div>
+    </div>
+    <?php $page = "person_page";
+          require_once(HOME_DIR.'/include/navmenu.php');
+    ?>
+  </body>
+</html>
