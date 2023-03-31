@@ -21,7 +21,7 @@ echo '
                 <a href="person.php">
                     <i class="fa fa-globe fa-2x"></i>
                     <span class="nav-text">
-                        База граждан
+                      Люди
                     </span>
                 </a>
             </li>

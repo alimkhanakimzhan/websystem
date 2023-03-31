@@ -12,13 +12,13 @@ require_once "config.php";
 
 if(!isset($_GET['id'])) {
   header("location: person.php");
-} 
+}
 else {
   $id = $_GET['id'];
-  if($query = $db->prepare("SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name as Gender, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as Nationality 
-  FROM persons INNER JOIN gender ON gender.id = persons.GenderID 
-  INNER JOIN regions ON regions.id = persons.birth_region_id 
-  INNER JOIN nationalities ON nationalities.id = persons.nationality_id 
+  if($query = $db->prepare("SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name as Gender, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as Nationality
+  FROM persons INNER JOIN gender ON gender.id = persons.GenderID
+  INNER JOIN regions ON regions.id = persons.birth_region_id
+  INNER JOIN nationalities ON nationalities.id = persons.nationality_id
   WHERE persons.id = $id ORDER BY `persons`.`id` ASC LIMIT 5")) {
   $query->execute();
   $result = $query->get_result();
@@ -124,10 +124,10 @@ else {
         </div>
           <div class="row mt-3">
               <?php
-                  if($query = $db->prepare("SELECT b.FirstName as full_name, relative_id, relationship_type.Name 
-                  FROM persons a INNER JOIN relatives ON relatives.person_id = a.id 
-                  INNER JOIN persons b ON b.id = relatives.relative_id 
-                  INNER JOIN relationship_type ON relatives.relationship_id = relationship_type.id 
+                  if($query = $db->prepare("SELECT b.FirstName as full_name, relative_id, relationship_type.Name
+                  FROM persons a INNER JOIN relatives ON relatives.person_id = a.id
+                  INNER JOIN persons b ON b.id = relatives.relative_id
+                  INNER JOIN relationship_type ON relatives.relationship_id = relationship_type.id
                   WHERE person_id =$id")) {
 
                   $query->execute();
@@ -143,11 +143,11 @@ else {
                                   // Надо поменять ссылки
                                   echo '
 
-                                   
+
                                     <div class="col-md-6">
                                       <label class="labels"><b>'.$relationship_type.'</b></label>
                                       <p>
-                                        <a href="https://localhost/websystem/person-single.php?id='.$user_id.'"> 
+                                        <a href="'.BASE_URL.'/person-single.php?id='.$user_id.'">
                                           '.$full_name.'
                                         </a>
                                       </p>
@@ -187,16 +187,16 @@ else {
 
      <div class="container rounded bg-white mt-5 mb-5">
        <div id="network"></div>
-        <?php 
+        <?php
           $nodes[] = [
             'id' => $id,
             'name' => $FirstName . ' ' . $LastName,
             'image' => $Photo,
-            'href' => 'https://localhost/websystem/person-single.php?id=' . $id
+            'href' => BASE_URL.'/person-single.php?id=' . $id
           ];
           $edges = [];
 
-          if($query = $db->prepare("SELECT b.id as relative_id, b.IIN as relative_IIN, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM persons a 
+          if($query = $db->prepare("SELECT b.id as relative_id, b.IIN as relative_IIN, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM persons a
           INNER JOIN relatives ON relatives.person_id=a.id
           INNER JOIN persons b ON relatives.relative_id = b.id
           INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
@@ -210,9 +210,9 @@ else {
                     'id' => $row['relative_IIN'],
                     'name' => $row['relative_name'],
                     'image' => 'images/avatars/persons/' . $row['relative_photo'],
-                    'href' => 'https://localhost/websystem/person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] ))
+                    'href' => BASE_URL.'/person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] ))
                   ];
-                  
+
                   $edges[] = [
                     'from' => $id,
                     'to' => $row['relative_id'],
@@ -223,7 +223,7 @@ else {
             }
           }
         ?>
-  
+
         <script>
               var container = document.getElementById('network');
 
@@ -239,7 +239,7 @@ else {
                   layout: {
                       hierarchical: false
                   },
-                  
+
                   physics: {  // Настройки физики
                       forceAtlas2Based: {  // Используется алгоритм ForceAtlas2 для расчета физики
                           gravitationalConstant: -200,  // Коэффициент гравитации. Отрицательное значение делает узлы отталкивающими друг друга
