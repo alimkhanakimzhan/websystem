@@ -193,7 +193,7 @@ else {
             'id' => $id,
             'name' => $FirstName . ' ' . $LastName,
             'image' => $Photo,
-            'href' => '/person-single.php?id=' . $id
+            'href' => 'person-single.php?id=' . $id
           ];
           $edges = [];
 
