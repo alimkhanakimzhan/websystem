@@ -34,16 +34,16 @@ require_once "config.php";
           if($end_period == "текущий момент"){$end_period='CURDATE()';};
 
           if($query = $db->prepare("
-          SELECT person.FirstName, person.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
+          SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
           co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_id, co_workers.Photo,
           co_workers.time_start_position, co_workers.time_end_position
           FROM job_history
-          JOIN person ON job_history.person_id = person.id
+          JOIN persons ON job_history.person_id = persons.id
           LEFT JOIN (
-          SELECT person.FirstName, person.LastName, job_history.person_id, job_history.position_name, person.Photo,
+          SELECT persons.FirstName, persons.LastName, job_history.person_id, job_history.position_name, persons.Photo,
           job_history.time_start_position, job_history.time_end_position
           FROM job_history
-          JOIN person ON job_history.person_id = person.id
+          JOIN persons ON job_history.person_id = persons.id
           WHERE job_history.organization_ID = $organization_ID
           AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period'
           ) co_workers ON co_workers.person_id != job_history.person_id
