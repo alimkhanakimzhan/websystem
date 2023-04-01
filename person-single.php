@@ -16,9 +16,9 @@ if(!isset($_GET['id'])) {
 else {
   $id = $_GET['id'];
   if($query = $db->prepare("SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name as Gender, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as Nationality
-  FROM persons INNER JOIN gender ON gender.id = persons.GenderID
-  INNER JOIN regions ON regions.id = persons.birth_region_id
-  INNER JOIN nationalities ON nationalities.id = persons.nationality_id
+  FROM persons LEFT JOIN gender ON gender.id = persons.GenderID
+  LEFT JOIN regions ON regions.id = persons.birth_region_id
+  LEFT JOIN nationalities ON nationalities.id = persons.nationality_id
   WHERE persons.id = $id ORDER BY `persons`.`id` ASC LIMIT 5")) {
   $query->execute();
   $result = $query->get_result();
@@ -49,7 +49,8 @@ else {
       <div class="container rounded bg-white mt-5 mb-5">
         <div class="row">
           <div class="col-md-3 border-right">
-              <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" height="150px" src="<?php echo $Photo; ?>">
+              <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" height="150px" src="<?php echo ($Photo == 'images/avatars/persons/') ? $Photo.'default_icon_profile.png' : $Photo; ?>">
+
                 <span class="font-weight-bold"><?php echo $FirstName; echo " "; echo $LastName; ?></span>
                 <!-- <span class="text-black-50"><?php echo "Должность"; ?></span>
                 <span> <?php echo "Место работы"; ?> </span> -->
@@ -124,7 +125,7 @@ else {
         </div>
           <div class="row mt-3">
               <?php
-                  if($query = $db->prepare("SELECT b.FirstName as full_name, relative_id, relationship_type.Name
+                  if($query = $db->prepare("SELECT b.FirstName, b.LastName, relative_id, relationship_type.Name
                   FROM persons a INNER JOIN relatives ON relatives.person_id = a.id
                   INNER JOIN persons b ON b.id = relatives.relative_id
                   INNER JOIN relationship_type ON relatives.relationship_id = relationship_type.id
@@ -136,7 +137,7 @@ else {
                     while ($row = $result->fetch_assoc()) {
                           if (! empty($row)) {
                                 $user_id = $row['relative_id'];
-                                $full_name = $row['full_name'];
+                                $full_name = $row['FirstName']." ".$row['LastName'];
                                 $relationship_type = $row['Name'];
 
                                 if($user_id!=0){
@@ -147,7 +148,7 @@ else {
                                     <div class="col-md-6">
                                       <label class="labels"><b>'.$relationship_type.'</b></label>
                                       <p>
-                                        <a href="'.BASE_URL.'/person-single.php?id='.$user_id.'">
+                                        <a href=person-single.php?id='.$user_id.'>
                                           '.$full_name.'
                                         </a>
                                       </p>
@@ -192,7 +193,7 @@ else {
             'id' => $id,
             'name' => $FirstName . ' ' . $LastName,
             'image' => $Photo,
-            'href' => BASE_URL.'/person-single.php?id=' . $id
+            'href' => '/person-single.php?id=' . $id
           ];
           $edges = [];
 
@@ -210,7 +211,7 @@ else {
                     'id' => $row['relative_IIN'],
                     'name' => $row['relative_name'],
                     'image' => 'images/avatars/persons/' . $row['relative_photo'],
-                    'href' => BASE_URL.'/person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] ))
+                    'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] ))
                   ];
 
                   $edges[] = [
