@@ -11,52 +11,54 @@ require_once "config.php";
 ?>
 
 <html>
-  <?php require_once(HOME_DIR.'/include/header.php') ?>
-  <body>
-    <div class="wrapper" style="">
-        <div class="container rounded bg-white mt-5 mb-5">
-          <!-- search form start-->
-          <form class="container mt-5" action="person.php" method="GET">
-            <div class="row d-flex justify-content-center">
-              <div class="col-md-10">
-                <div class="card p-3  py-4">
-                  <h5>Поиск гражданина:</h5>
-                    <div class="row g-3 mt-2">
-                      <div class="col-md-9">
-                        <input name="search-field" type="text" class="form-control" placeholder="Введите ИИН, пример: 010203040506">
+<?php require_once(HOME_DIR.'/include/header.php') ?>
+
+<body>
+  <div class="wrapper" style="">
+    <div class="container rounded bg-white mt-5 mb-5">
+      <!-- search form start-->
+      <form class="container mt-5" action="person.php" method="GET">
+        <div class="row d-flex justify-content-center">
+          <div class="col-md-10">
+            <div class="card p-3  py-4">
+              <h5>Поиск гражданина:</h5>
+              <div class="row g-3 mt-2">
+                <div class="col-md-9">
+                  <input name="search-field" type="text" class="form-control"
+                    placeholder="Введите ИИН, пример: 010203040506">
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-secondary btn-block">Найти</button>
+                </div>
+              </div>
+              <div class="mt-3">
+                <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false"
+                  aria-controls="collapseExample" class="advanced"> Дополнительные параметры <i
+                    class="fa fa-angle-down"></i>
+                </a>
+                <div class="collapse" id="collapseExample">
+                  <div class="card card-body">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Имя" name="FirstName">
                       </div>
-                      <div class="col-md-3">
-                        <button class="btn btn-secondary btn-block">Найти</button>
+                      <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Фамилия" name="LastName">
                       </div>
-                    </div>
-                    <div class="mt-3">
-                      <a data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" 
-                        aria-controls="collapseExample" 
-                        class="advanced"> Дополнительные параметры <i class="fa fa-angle-down"></i>
-                      </a>
-                    <div class="collapse" id="collapseExample">
-                      <div class="card card-body">
-                        <div class="row">
-                          <div class="col-md-4">
-                            <input type="text" class="form-control" placeholder="Имя" name="FirstName">
-                          </div>
-                          <div class="col-md-4">
-                            <input type="text" class="form-control" placeholder="Фамилия" name="LastName">
-                          </div>
-                          <div class="col-md-4">
-                            <input type="text" class="form-control" placeholder="Отчество" name="Patronymic">
-                          </div>
-                        </div>
+                      <div class="col-md-4">
+                        <input type="text" class="form-control" placeholder="Отчество" name="Patronymic">
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </form>
-          <!-- search form end-->
+          </div>
+        </div>
+      </form>
+      <!-- search form end-->
 
-        <?php
+      <?php
           $search_field_parameter = isset($_GET['search-field']) ? $_GET['search-field'] : '';
           $firstName_request = isset($_GET['FirstName']) ? $_GET['FirstName'] : '';
           $lastName_request = isset($_GET['LastName']) ? $_GET['LastName'] : '';
@@ -131,7 +133,7 @@ require_once "config.php";
             }
 
           } else {
-          $query = "SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, Gender.Gender, BirthDate, regions_list.name as PlaceOfBirth, nationality_list.nationality as nationality FROM person INNER JOIN Gender ON Gender.id = person.Gender INNER JOIN regions_list ON regions_list.id = person.PlaceOfBirth INNER JOIN nationality_list ON nationality_list.id = person.Nationality WHERE ";
+          $query = "SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as nationality FROM persons INNER JOIN gender ON gender.id = persons.GenderID INNER JOIN regions ON regions.id = persons.birth_region_id INNER JOIN nationalities ON nationalities.id = persons.nationality_id WHERE ";
 
 
           if($search_field_parameter !=''){
@@ -148,7 +150,7 @@ require_once "config.php";
           }
 
           $query = rtrim($query, "AND ");
-          $query .= "ORDER BY `person`.`id` LIMIT 50";
+          $query .= "ORDER BY `persons`.`id` LIMIT 50";
 
           if($query = $db->prepare($query) ) {
 
@@ -177,7 +179,7 @@ require_once "config.php";
                     $Patronymic = $row["Patronymic"];
                     $BirthDate = $row["BirthDate"];
                     $PlaceOfBirth = $row["PlaceOfBirth"];
-                    $Photo = $row["Photo"];
+                    $Photo = 'images/avatars/persons/' . $row["Photo"];
 
 
                     echo '
@@ -223,11 +225,12 @@ require_once "config.php";
           }
           }
         ?>
-        </table>
-      </div>
+      </table>
     </div>
-    <?php $page = "person_page";
+  </div>
+  <?php $page = "person_page";
           require_once(HOME_DIR.'/include/navmenu.php');
     ?>
-  </body>
+</body>
+
 </html>

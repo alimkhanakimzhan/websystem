@@ -10,7 +10,7 @@ define('DBNAME', 'websystem'); // Database name
 /* using constants for path */
 DEFINE ('HOME_DIR', dirname( realpath(__FILE__)) );
 DEFINE ('BASE_DIR', basename(HOME_DIR));
-
+DEFINE ('BASE_URL', 'http://localhost/websystem/websystem');
 
 /* connect to MySQL database */
 $db = mysqli_connect(DBSERVER, DBUSERNAME, DBPASSWORD, DBNAME);
