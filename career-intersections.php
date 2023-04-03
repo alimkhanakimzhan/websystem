@@ -16,6 +16,63 @@ require_once "config.php";
 <body>
   <div class="wrapper" style="">
     <div class="container rounded bg-white mt-5 mb-5">
+    <div id="graph"></div>
+    <?php 
+      $id = $_GET['id'];
+      $organization_ID = $_GET['organization_id'];
+      $start_period = $_GET['start_period'];
+      $end_period = $_GET['end_period'];
+      $intersections = [];
+
+      if($query = $db->prepare("
+      SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
+      co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_id, co_workers.Photo,
+      co_workers.time_start_position, co_workers.time_end_position
+      FROM job_history
+      JOIN persons ON job_history.person_id = persons.id
+      LEFT JOIN (
+      SELECT persons.FirstName, persons.LastName, job_history.person_id, job_history.position_name, persons.Photo,
+      job_history.time_start_position, job_history.time_end_position
+      FROM job_history
+      JOIN persons ON job_history.person_id = persons.id
+      WHERE job_history.organization_ID = $organization_ID
+      AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period'
+      ) co_workers ON co_workers.person_id != job_history.person_id
+      WHERE job_history.person_id = $id
+      AND job_history.organization_ID = $organization_ID
+      AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ;")) 
+      {
+        $query->execute();
+        $result = $query->get_result();
+          if($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+              if (! empty($row)) {
+                $intersections[] = [
+                  'id' => $row['person_id'],
+                  'content' => $row['CoWorkerFirstName'] . ' ' . $row['CoWorkerLastName'],
+                  'PositionName' => $row['position_name'],
+                  'time_start_position' => $row['time_start_position'],
+                  'time_end_position' => $row['time_end_position']
+                ];
+              }
+            }
+          }
+      }
+    ?>
+
+    <script>
+      // DOM element where the Timeline will be attached
+      var container = document.getElementById('graph');
+
+      // Create a DataSet (allows two way data-binding)
+      var items = new vis.DataSet(<?php echo json_encode($intersections, JSON_UNESCAPED_UNICODE) ?>);
+
+      // Configuration for the Timeline
+      var options = {};
+
+      // Create a Timeline
+      var timeline = new vis.Timeline(container, items, options);
+    </script>
 
       <?php
         if(!isset($_GET['id'])) {
