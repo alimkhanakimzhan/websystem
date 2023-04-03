@@ -345,7 +345,8 @@ else {
             $time_start_position = $row["time_start_position"];
             $time_end_position = $row["time_end_position"];
             if ($time_end_position == "0000-00-00") {
-            $time_end_position = "текущий момент";
+            $date = new DateTime(); // create a new DateTime object with the current date and time
+            $time_end_position = $date->format('Y-m-d');;
             }
             $organization_id = $row["organization_ID"];
             $organization_name = $row["organization_name"];
@@ -359,7 +360,11 @@ else {
                 <div class="col-md-12"><label class="labels">Место Работы <a href="career-intersections.php?id='.$id.'&organization_id='.$organization_id.'&start_period='.$time_start_position.'&end_period='.$time_end_position.'">(Карьерные пересечения)</a></label><input type="text" class="form-control" placeholder="'.$organization_name.'" value="" readonly></div>
                 <div class="col-md-12"><label class="labels">Должность</label>
                 <input type="text" class="form-control" placeholder="'.$position_name.'" value="" readonly>
-                </div>
+                </div>';
+
+                if ($time_end_position == $date->format('Y-m-d')) {
+                $time_end_position = "текущий момент";}
+                echo '
                 <div class="col-md-12"><label class="labels">Период работы:</label>
                 с '.$time_start_position.' по '.$time_end_position.'
                 </div>

@@ -17,13 +17,15 @@ require_once "config.php";
   <div class="wrapper" style="">
     <div class="container rounded bg-white mt-5 mb-5">
     <div id="graph"></div>
-    <?php 
+    <?php
       $id = $_GET['id'];
       $organization_ID = $_GET['organization_id'];
       $start_period = $_GET['start_period'];
       $end_period = $_GET['end_period'];
       $intersections = [];
       $counter = 1;
+
+
 
       if($query = $db->prepare("
       SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
@@ -41,7 +43,7 @@ require_once "config.php";
       ) co_workers ON co_workers.person_id != job_history.person_id
       WHERE job_history.person_id = $id
       AND job_history.organization_ID = $organization_ID
-      AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ORDER BY co_workers.time_start_position ASC;")) 
+      AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ORDER BY co_workers.time_start_position ASC;"))
       {
         $query->execute();
         $result = $query->get_result();
@@ -62,7 +64,7 @@ require_once "config.php";
                 'start' => $row['time_start_position'],
                 'end' => $end_date
               ];
-              
+
 
               $counter+=1;
             }
@@ -103,7 +105,7 @@ require_once "config.php";
         }
 
       };
-      
+
 
       // Create a Timeline
       var timeline = new vis.Timeline(container, items, options);
@@ -142,13 +144,13 @@ require_once "config.php";
           ) co_workers ON co_workers.person_id != job_history.person_id
           WHERE job_history.person_id = $id
           AND job_history.organization_ID = $organization_ID
-          AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ORDER BY co_workers.time_start_position ASC ;")) 
+          AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ORDER BY co_workers.time_start_position ASC ;"))
           {
             $query->execute();
             $result = $query->get_result();
-            if ($row = $result->fetch_assoc()) 
+            if ($row = $result->fetch_assoc())
             {
-                if (! empty($row)) 
+                if (! empty($row))
                 {
 
                   echo '
@@ -164,7 +166,9 @@ require_once "config.php";
                       </thead>
                       <tbody>
                   ';
-
+                  if ($row['time_end_position'] == "0000-00-00") {
+                  $row['time_end_position'] = "текущий момент";
+                  }
                   echo
                       '<tr class="alert" role="alert">
                         <td class="d-flex align-items-center">
