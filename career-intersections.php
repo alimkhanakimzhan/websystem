@@ -164,6 +164,7 @@ require_once "config.php";
                       </thead>
                       <tbody>
                   ';
+
                   echo
                       '<tr class="alert" role="alert">
                         <td class="d-flex align-items-center">
@@ -213,11 +214,11 @@ require_once "config.php";
                         </td>
                       </tr>';
                   }
-                  echo '
-                  </tbody>
-                  </table>
-                  ';
-                }
+                echo '
+                </tbody>
+                </table>
+                ';
+              }
             }
             else{
                 header("Location:  person-single.php?id=$id");
