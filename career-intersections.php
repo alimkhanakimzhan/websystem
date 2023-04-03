@@ -24,30 +24,23 @@ require_once "config.php";
       $end_period = $_GET['end_period'];
       $intersections = [];
 
-      if($end_period == "текущий момент"){
-        $end_period='CURRENT_DATE()';
-      }else{
-        $end_period="'".$end_period."'";
-      }
-
-      $sql = "SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
-          co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_id, co_workers.Photo,
-          co_workers.time_start_position, co_workers.time_end_position
-          FROM job_history
-          JOIN persons ON job_history.person_id = persons.id
-          LEFT JOIN (
-          SELECT persons.FirstName, persons.LastName, job_history.person_id, job_history.position_name, persons.Photo,
-          job_history.time_start_position, job_history.time_end_position
-          FROM job_history
-          JOIN persons ON job_history.person_id = persons.id
-          WHERE job_history.organization_ID = $organization_ID
-          AND job_history.time_start_position BETWEEN '$start_period' AND ".$end_period."
-          ) co_workers ON co_workers.person_id != job_history.person_id
-          WHERE job_history.person_id = $id
-          AND job_history.organization_ID = $organization_ID
-          AND job_history.time_start_position BETWEEN '$start_period' AND ".$end_period." ;";
-
-      if($query = $db->prepare($sql)) 
+      if($query = $db->prepare("
+      SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
+      co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_id, co_workers.Photo,
+      co_workers.time_start_position, co_workers.time_end_position
+      FROM job_history
+      JOIN persons ON job_history.person_id = persons.id
+      LEFT JOIN (
+      SELECT persons.FirstName, persons.LastName, job_history.person_id, job_history.position_name, persons.Photo,
+      job_history.time_start_position, job_history.time_end_position
+      FROM job_history
+      JOIN persons ON job_history.person_id = persons.id
+      WHERE job_history.organization_ID = $organization_ID
+      AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period'
+      ) co_workers ON co_workers.person_id != job_history.person_id
+      WHERE job_history.person_id = $id
+      AND job_history.organization_ID = $organization_ID
+      AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ;")) 
       {
         $query->execute();
         $result = $query->get_result();
@@ -96,17 +89,27 @@ require_once "config.php";
           </p>
           ';
 
-          if($end_period == "текущий момент"){
-            $end_period='CURRENT_DATE()';
-          }else{
-            $end_period="'".$end_period."'";
-          }
+          if($end_period == "текущий момент"){$end_period='CURDATE()';};
 
-
-
-          if($query = $db->prepare($sql)) 
+          if($query = $db->prepare("
+          SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
+          co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_id, co_workers.Photo,
+          co_workers.time_start_position, co_workers.time_end_position
+          FROM job_history
+          JOIN persons ON job_history.person_id = persons.id
+          LEFT JOIN (
+          SELECT persons.FirstName, persons.LastName, job_history.person_id, job_history.position_name, persons.Photo,
+          job_history.time_start_position, job_history.time_end_position
+          FROM job_history
+          JOIN persons ON job_history.person_id = persons.id
+          WHERE job_history.organization_ID = $organization_ID
+          AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period'
+          ) co_workers ON co_workers.person_id != job_history.person_id
+          WHERE job_history.person_id = $id
+          AND job_history.organization_ID = $organization_ID
+          AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ;")) 
           {
-            
+
             $query->execute();
             $result = $query->get_result();
             if ($row = $result->fetch_assoc()) 
