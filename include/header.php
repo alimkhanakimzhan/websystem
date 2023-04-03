@@ -11,7 +11,7 @@ echo '
   <script src="js/jquery.min.js"></script>
   <script src="js/main.js"></script>
   <script src="js/vis-network.min.js"></script>
-
+  <script src="js/vis-timeline-graph2d.min.js"></script>
 </head>
 '
 ?>
