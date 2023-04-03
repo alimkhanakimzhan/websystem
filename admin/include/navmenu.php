@@ -15,13 +15,13 @@ echo '
                 </a>
             </li>
             <li class=';
-            if ($page == "person_page")
+            if ($page == "users_page")
             {echo "active"; }; echo '
             >
-                <a href="person.php">
-                    <i class="fa fa-globe fa-2x"></i>
+                <a href="users.php">
+                    <i class="fa fa-user fa-2x"></i>
                     <span class="nav-text">
-                      Люди
+                      Пользователи
                     </span>
                 </a>
             </li>

@@ -10,7 +10,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 }
 else {
   if ($_SESSION['role'] == 0){
-    header("location: BASE_DIR./index.php");
+    header("location: ../index.php");
   }
 }
 
