@@ -345,8 +345,7 @@ else {
             $time_start_position = $row["time_start_position"];
             $time_end_position = $row["time_end_position"];
             if ($time_end_position == "0000-00-00") {
-            $date = new DateTime(); // create a new DateTime object with the current date and time
-            $time_end_position = $date->format('Y-m-d');;
+              $time_end_position = date('Y-m-d');
             }
             $organization_id = $row["organization_ID"];
             $organization_name = $row["organization_name"];
@@ -362,7 +361,7 @@ else {
                 <input type="text" class="form-control" placeholder="'.$position_name.'" value="" readonly>
                 </div>';
 
-                if ($time_end_position == $date->format('Y-m-d')) {
+                if ($time_end_position == date('Y-m-d')) {
                 $time_end_position = "текущий момент";}
                 echo '
                 <div class="col-md-12"><label class="labels">Период работы:</label>
