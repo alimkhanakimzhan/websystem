@@ -126,7 +126,6 @@ require_once "config.php";
           </p>
           ';
 
-          if($end_period == "текущий момент"){$end_period='CURDATE()';};
 
           if($query = $db->prepare("
           SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,

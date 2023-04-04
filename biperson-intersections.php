@@ -145,7 +145,7 @@ require_once "config.php";
                       $relative1_as_person = getPersonByID($db, $relative1['relative_id']);
                       $relative2_as_person = getPersonByID($db, $relative2['relative_id']);
                         if ($relative1_as_person['FirstName'] == $relative2_as_person['FirstName'] AND $relative1_as_person['LastName'] == $relative2_as_person['LastName'] ) {
-                            echo "Общие родственные свзязи с: " . $relative1_as_person['FirstName'] . ' ' . $relative1_as_person['LastName'] ."<br>";
+                            echo "Общие родственные связи с: " . $relative1_as_person['FirstName'] . ' ' . $relative1_as_person['LastName'] ."<br>";
                         }
                     }
                   }

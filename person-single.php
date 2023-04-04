@@ -198,14 +198,14 @@ else {
           $edges = [];
 
           if($query = $db->prepare("SELECT b.id as relative_id, b.IIN as relative_IIN, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM persons a
-          INNER JOIN relatives ON relatives.person_id=a.id
-          INNER JOIN persons b ON relatives.relative_id = b.id
-          INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-          WHERE a.id =$id")){
-          $query->execute();
-          $result = $query->get_result();
-          if($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
+            INNER JOIN relatives ON relatives.person_id=a.id
+            INNER JOIN persons b ON relatives.relative_id = b.id
+            INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
+            WHERE a.id =$id")){
+            $query->execute();
+            $result = $query->get_result();
+            if($result->num_rows > 0) {
+              while ($row = $result->fetch_assoc()) {
                 if (! empty($row)) {
                   $nodes[] = [
                     'id' => $row['relative_IIN'],
