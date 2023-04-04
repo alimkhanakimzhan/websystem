@@ -315,6 +315,10 @@ else {
 
               var network = new vis.Network(container, data, options);
 
+              // network.on("click", function (obj) {
+              //     alert(this.getNodeAt(obj.pointer.DOM));
+              // });
+
               network.on("doubleClick", function (params) {
                   var node = network.getNodeAt(params.pointer.DOM);
                   for(i in nodes){
