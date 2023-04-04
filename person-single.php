@@ -49,7 +49,7 @@ else {
       <div class="container rounded bg-white mt-5 mb-5">
         <div class="row">
           <div class="col-md-3 border-right">
-              <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" height="150px" src="<?php echo ($Photo == 'images/avatars/persons/') ? $Photo.'default_icon_profile.png' : $Photo; ?>">
+              <div class="d-flex flex-column align-items-center text-center p-3 py-5"><img class="rounded-circle mt-5" width="150px" height="150px" src="<?php echo ($Photo == 'images/avatars/persons/') ? $Photo.'default_icon.png' : $Photo; ?>">
 
                 <span class="font-weight-bold"><?php echo $FirstName; echo " "; echo $LastName; ?></span>
                 <!-- <span class="text-black-50"><?php echo "Должность"; ?></span>
@@ -210,8 +210,9 @@ else {
                   $nodes[] = [
                     'id' => $row['relative_IIN'],
                     'name' => $row['relative_name'],
-                    'image' => 'images/avatars/persons/' . $row['relative_photo'],
-                    'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] ))
+                    'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
+                    'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
+                    'label' => $row['relationship_type']."\n".$row['relative_name']
                   ];
 
                   $edges[] = [

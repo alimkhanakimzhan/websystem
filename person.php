@@ -97,7 +97,7 @@ require_once "config.php";
                     $Patronymic = $row["Patronymic"];
                     $BirthDate = $row["BirthDate"];
                     $PlaceOfBirth = $row["PlaceOfBirth"];
-                    $Photo = 'images/avatars/persons/' . $row["Photo"];
+                    $Photo = 'images/avatars/persons/' . (($row["Photo"] == '') ? 'default_icon.png' : $row["Photo"]);
 
                     echo '
 
@@ -179,7 +179,7 @@ require_once "config.php";
                     $Patronymic = $row["Patronymic"];
                     $BirthDate = $row["BirthDate"];
                     $PlaceOfBirth = $row["PlaceOfBirth"];
-                    $Photo = 'images/avatars/persons/' . $row["Photo"];
+                    $Photo = 'images/avatars/persons/' .  (($row["Photo"] == '') ? 'default_icon.png' : $row["Photo"]);
 
 
                     echo '
