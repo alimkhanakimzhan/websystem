@@ -91,7 +91,7 @@ require_once "config.php";
       // Configuration for the Timeline
       var options = {
         // width: '1000px',
-        height: '350px',
+        height: '70%',
         orientation: 'top',
         stack: true,
         align: 'left',
