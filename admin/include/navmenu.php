@@ -26,13 +26,13 @@ echo '
                 </a>
             </li>
             <li class=';
-            if ($page == "biperson_intersections_page")
+            if ($page == "person_page")
             {echo "active"; }; echo '
             >
-               <a href="biperson-intersections.php">
-                   <i class="fa fa-people-arrows fa-2x"></i>
+               <a href="person.php">
+                   <i class="fa fa-globe fa-2x"></i>
                     <span class="nav-text">
-                        Поиск отношений между людьми
+                        База граждан
                     </span>
                 </a>
             </li>
