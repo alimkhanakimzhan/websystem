@@ -192,23 +192,39 @@ else {
           $nodes[] = [
             'id' => $id,
             'name' => $FirstName . ' ' . $LastName,
-            'image' => $Photo,
-            'href' => 'person-single.php?id=' . $id
+            'image' => (($Photo=='images/avatars/persons/')?'images/avatars/persons/default_icon.png':$Photo),
+            'href' => 'person-single.php?id=' . $id,
+            'label' => '<b>' . $FirstName . ' ' . $LastName . '</b>',
+            'font' => [
+              'multi' =>  "html", 
+              'size' =>  20
+            ]
           ];
           $edges = [];
+          // $displayed_ids = array($id);
 
-          if($query = $db->prepare("SELECT b.id as relative_id, b.IIN as relative_IIN, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM persons a
-            INNER JOIN relatives ON relatives.person_id=a.id
-            INNER JOIN persons b ON relatives.relative_id = b.id
-            INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-            WHERE a.id =$id")){
+          //query after UNION is added in case backward relative connection wasn't added to DB
+          if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives INNER JOIN persons b ON relatives.relative_id = b.id
+          INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
+          WHERE relatives.person_id =$id 
+          UNION 
+          SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, CONCAT(relationship_type.Name, ' человека')  as relationship_type FROM relatives
+          INNER JOIN persons b ON relatives.person_id = b.id
+          INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
+          WHERE relatives.relative_id = $id) as person_relatives WHERE relative_id not in ('') GROUP BY person_relatives.relative_id;")){
             $query->execute();
             $result = $query->get_result();
             if($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
                 if (! empty($row)) {
+
+                //   if (in_array($row['relative_id'], $displayed_ids)){
+                //     continue;
+                // }
+                // array_push($displayed_ids, $row['relative_id']);
+
                   $nodes[] = [
-                    'id' => $row['relative_IIN'],
+                    'id' => $row['relative_id'],
                     'name' => $row['relative_name'],
                     'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
                     'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
