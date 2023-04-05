@@ -6,12 +6,16 @@ echo '
   <link rel="stylesheet" href="css/table.css" />
   <link rel="stylesheet" href="css/fontawesome-5.15.4/css/all.css" />
   <link rel="stylesheet" href="css/bootstrap.min.css" id="bootstrap-css" />
+  <link rel="stylesheet" href="css/leaflet.css"/>
+
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap.bundle.min.js"></script>
   <script src="js/jquery.min.js"></script>
   <script src="js/main.js"></script>
   <script src="js/vis-network.min.js"></script>
   <script src="js/vis-timeline-graph2d.min.js"></script>
+  <script src="js/leaflet.js"></script>
+
 </head>
 '
 ?>
