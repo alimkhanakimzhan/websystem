@@ -187,6 +187,7 @@ else {
         </div>
 
      <div class="container rounded bg-white mt-5 mb-5">
+     <button class="btn btn-primary" name="searchFurther" id="searchFurther">Искать дальше</button>
        <div id="network"></div>
         <?php
           $nodes[] = [
@@ -200,28 +201,32 @@ else {
               'size' =>  20
             ]
           ];
+
           $edges = [];
-          // $displayed_ids = array($id);
+          $displayed_ids = array($id);
+          $displayed_ids_string = implode(',', $displayed_ids);
 
           //query after UNION is added in case backward relative connection wasn't added to DB
-          if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives INNER JOIN persons b ON relatives.relative_id = b.id
+          if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, 
+          b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives 
+          INNER JOIN persons b ON relatives.relative_id = b.id
           INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
           WHERE relatives.person_id =$id 
           UNION 
           SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, CONCAT(relationship_type.Name, ' человека')  as relationship_type FROM relatives
           INNER JOIN persons b ON relatives.person_id = b.id
           INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-          WHERE relatives.relative_id = $id) as person_relatives WHERE relative_id not in ('') GROUP BY person_relatives.relative_id;")){
+          WHERE relatives.relative_id = $id) as person_relatives WHERE relative_id not in ($displayed_ids_string) GROUP BY person_relatives.relative_id;")){
             $query->execute();
             $result = $query->get_result();
             if($result->num_rows > 0) {
               while ($row = $result->fetch_assoc()) {
                 if (! empty($row)) {
 
-                //   if (in_array($row['relative_id'], $displayed_ids)){
-                //     continue;
-                // }
-                // array_push($displayed_ids, $row['relative_id']);
+                  if (in_array($row['relative_id'], $displayed_ids)){
+                    continue;
+                  }
+                  array_push($displayed_ids, $row['relative_id']);
 
                   $nodes[] = [
                     'id' => $row['relative_id'],
@@ -238,6 +243,7 @@ else {
                   ];
                 }
               }
+              $displayed_ids_string = implode(',', $displayed_ids); //update list of displayed arrays
             }
           }
         ?>
@@ -331,12 +337,9 @@ else {
 
               var network = new vis.Network(container, data, options);
 
-              // network.on("click", function (obj) {
-              //     alert(this.getNodeAt(obj.pointer.DOM));
-              // });
-
-              network.on("doubleClick", function (params) {
-                  var node = network.getNodeAt(params.pointer.DOM);
+              network.on("doubleClick", function (obj) {
+                if (this.getNodeAt(obj.pointer.DOM) != undefined){
+                  var node = network.getNodeAt(obj.pointer.DOM);
                   for(i in nodes){
                     if (nodes[i]["id"] == node){
                       var href = nodes[i]["href"];
@@ -344,6 +347,7 @@ else {
                     }
                   }
                   window.open(href, '_blank');
+                }
               });
 
           </script>
