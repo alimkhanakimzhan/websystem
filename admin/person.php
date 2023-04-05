@@ -112,7 +112,7 @@ else {
                         <div class="img" style="background-image: url('.$Photo.');"></div>
                       </td>
                       <td class="">
-                        <a href=person-single.php?id='.$id.'> <span>'.$iin.'</span> </a>
+                        <a href=edit-person.php?id='.$id.'> <span>'.$iin.'</span> </a>
 
                       </td>
                       <td class="">

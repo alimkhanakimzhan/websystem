@@ -98,215 +98,79 @@ else {
         <div class="d-flex justify-content-between align-items-center mb-3">
             <h4 class="text-right">Семья</h4>
         </div>
-          <div class="row mt-3">
-              <?php
-                  if($query = $db->prepare("SELECT b.FirstName, b.LastName, relative_id, relationship_type.Name, relationship_type.priority
-                  FROM persons a INNER JOIN relatives ON relatives.person_id = a.id
-                  INNER JOIN persons b ON b.id = relatives.relative_id
-                  INNER JOIN relationship_type ON relatives.relationship_id = relationship_type.id
-                  WHERE person_id =$id ORDER BY relationship_type.priority")) {
+        <div class="row">
+          <div class="col-md-6">
+            <div class="row mt-3">
+                <?php
+                    if($query = $db->prepare("SELECT b.FirstName, b.LastName, relative_id, relationship_type.Name, relationship_type.priority
+                    FROM persons a INNER JOIN relatives ON relatives.person_id = a.id
+                    INNER JOIN persons b ON b.id = relatives.relative_id
+                    INNER JOIN relationship_type ON relatives.relationship_id = relationship_type.id
+                    WHERE person_id =$id ORDER BY relationship_type.priority")) {
 
-                  $query->execute();
-                  $result = $query->get_result();
-                  if($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                          if (! empty($row)) {
-                                $user_id = $row['relative_id'];
-                                $full_name = $row['FirstName']." ".$row['LastName'];
-                                $relationship_type = $row['Name'];
+                    $query->execute();
+                    $result = $query->get_result();
+                    if($result->num_rows > 0) {
+                      while ($row = $result->fetch_assoc()) {
+                            if (! empty($row)) {
+                                  $user_id = $row['relative_id'];
+                                  $full_name = $row['FirstName']." ".$row['LastName'];
+                                  $relationship_type = $row['Name'];
 
-                                if($user_id!=0){
-                                  // Надо поменять ссылки
-                                  echo '
-
-
-                                    <div class="col-md-6">
-                                      <label class="labels"><b>'.$relationship_type.'</b></label>
-                                      <p>
-                                        <a href=person-single.php?id='.$user_id.'>
-                                          '.$full_name.'
-                                        </a>
-                                      </p>
-                                    </div>
-                                  ';
-                                }
-                                else {
-                                  echo '
+                                  if($user_id!=0){
+                                    // Надо поменять ссылки
+                                    echo '
 
 
-                                    <div class="col-md-6">
-                                      <label class="labels"><b>'.$relationship_type.'</b></label>
+                                      <div class="col-md-6">
+                                        <label class="labels"><b>'.$relationship_type.'</b></label>
                                         <p>
-                                        '.$full_name.'
+                                          <a href=person-single.php?id='.$user_id.'>
+                                            '.$full_name.'
+                                          </a>
                                         </p>
-                                    </div>
-                                  ';
+                                      </div>
+                                    ';
+                                  }
+                                  else {
+                                    echo '
+
+
+                                      <div class="col-md-6">
+                                        <label class="labels"><b>'.$relationship_type.'</b></label>
+                                          <p>
+                                          '.$full_name.'
+                                          </p>
+                                      </div>
+                                    ';
+                                  }
+
+
                                 }
-
-
                               }
                             }
-                          }
-                          else {
-                            echo '
-                            <div class="col-md-3">
-                              Неизвестно
-                            </div>';
-                          }
+                            else {
+                              echo '
+                              <div class="col-md-3">
+                                Неизвестно
+                              </div>';
+                            }
 
-                    }
+                      }
 
-                ?>
+                  ?>
 
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="row mt-3">
+                Add new member
+              </div>
+            </div>
           </div>
         </div>
 
-     <div class="container rounded bg-white mt-5 mb-5">
-       <div id="network"></div>
-        <?php
-          $nodes[] = [
-            'id' => $id,
-            'name' => $FirstName . ' ' . $LastName,
-            'image' => $Photo,
-            'href' => 'person-single.php?id=' . $id
-          ];
-          $edges = [];
 
-          if($query = $db->prepare("SELECT b.id as relative_id, b.IIN as relative_IIN, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM persons a
-            INNER JOIN relatives ON relatives.person_id=a.id
-            INNER JOIN persons b ON relatives.relative_id = b.id
-            INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-            WHERE a.id =$id")){
-            $query->execute();
-            $result = $query->get_result();
-            if($result->num_rows > 0) {
-              while ($row = $result->fetch_assoc()) {
-                if (! empty($row)) {
-                  $nodes[] = [
-                    'id' => $row['relative_IIN'],
-                    'name' => $row['relative_name'],
-                    'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
-                    'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
-                    'label' => $row['relationship_type']."\n".$row['relative_name']
-                  ];
-
-                  $edges[] = [
-                    'from' => $id,
-                    'to' => $row['relative_id'],
-                    'relationship_type' => $row['relationship_type'],
-                  ];
-                }
-              }
-            }
-          }
-        ?>
-
-        <script>
-              var container = document.getElementById('network');
-
-              var nodes = <?php echo json_encode($nodes, JSON_UNESCAPED_UNICODE) ?>;
-              var edges = <?php echo json_encode($edges, JSON_UNESCAPED_UNICODE) ?>;
-
-              var data = {
-                  nodes: nodes,
-                  edges: edges
-              };
-
-              var options = {
-                  layout: {
-                      hierarchical: false
-                  },
-
-                  physics: {  // Настройки физики
-                      forceAtlas2Based: {  // Используется алгоритм ForceAtlas2 для расчета физики
-                          gravitationalConstant: -200,  // Коэффициент гравитации. Отрицательное значение делает узлы отталкивающими друг друга
-                          centralGravity: 0.005,  // Коэффициент центральной гравитации. Определяет насколько сильно центральный узел будет притягивать другие узлы
-                          springLength: 100,  // Длина пружины. Определяет, насколько далеко узлы могут быть друг от друга
-                          springConstant: 0.02,  // Коэффициент жесткости пружины. Определяет, насколько быстро узлы будут двигаться к своей нормальной длине пружины
-                          damping: 0.4,  // Коэффициент затухания. Определяет, насколько быстро узлы будут останавливаться
-                          avoidOverlap: 0  // Коэффициент избегания перекрытия узлов. Устанавливается в 1 для предотвращения перекрытий
-                      },
-                      maxVelocity: 50,  // Максимальная скорость узлов
-                      minVelocity: 0.1,  // Минимальная скорость узлов
-                      solver: "forceAtlas2Based",  // Используется алгоритм ForceAtlas2 для решения физических конфликтов
-                      timestep: 0.5,  // Интервал времени между расчетами физики
-                      stabilization: { iterations: 2000 }  // Количество итераций стабилизации после рисования графа. Нужно для предотвращения дрожания узлов
-                  },
-
-                  nodes: {
-                      shape: "circularImage",
-                      size: 70, // Размер узлов
-                      distance: 1250,
-                      shapeProperties: {
-                              useImageSize: true
-                      },
-                      borderWidth: 2,
-                      borderWidthSelected: 4,
-                      font: {
-                          color: '#343434',
-                          size: 16,
-                          face: 'arial',
-                          background: 'none',
-                          strokeWidth: 0,
-                          strokeColor: '#ffffff'
-                      },
-                      color: {
-                          border: '#2B7CE9',
-                          background: '#97C2FC',
-                          highlight: {
-                              border: '#2B7CE9',
-                              background: '#D2E5FF'
-                          },
-                          hover: {
-                              border: '#2B7CE9',
-                              background: '#D2E5FF'
-                          }
-                      }
-                  },
-
-                  edges: {
-                      size: 40,
-                      length: 400,
-                      smooth: {
-                          type: 'continuous'
-                      },
-                      width: 2,
-                      color: {
-                          color: '#757575',
-                          highlight: '#757575',
-                          hover: '#757575'
-                      }
-                  },
-                  interaction: {
-                      hover: true,
-                      navigationButtons: true,
-                      keyboard: true,
-                      zoomView: false // запрещаем масштабирование с помощью мыши
-                  },
-                  // manipulation: {
-                      // enabled: true // добавляет функцию редактирования графика по идее не нужно?
-                  // }
-              };
-
-              var network = new vis.Network(container, data, options);
-
-              // network.on("click", function (obj) {
-              //     alert(this.getNodeAt(obj.pointer.DOM));
-              // });
-
-              network.on("doubleClick", function (params) {
-                  var node = network.getNodeAt(params.pointer.DOM);
-                  for(i in nodes){
-                    if (nodes[i]["id"] == node){
-                      var href = nodes[i]["href"];
-                      break;
-                    }
-                  }
-                  window.open(href, '_blank');
-              });
-
-          </script>
-     </div>
      <hr>
 
      <div class="container rounded bg-white mt-5 mb-5">
@@ -357,7 +221,7 @@ else {
       </div>
     </div>
     <?php $page = "person_page";
-          require_once(HOME_DIR.'/include/navmenu.php');
+          require_once(HOME_DIR.'/admin/include/navmenu.php');
     ?>
   </body>
 </html>

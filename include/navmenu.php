@@ -36,11 +36,14 @@ echo '
                     </span>
                 </a>
             </li>
-            <li>
-                <a href="#">
-                   <i class="fa fa-info fa-2x"></i>
+            <li class=';
+            if ($page == "map_page")
+            {echo "active"; }; echo '
+            >
+                <a href="map-page.php">
+                   <i class="fa fa-map-marker fa-2x"></i>
                     <span class="nav-text">
-                        Информация
+                        Map Page
                     </span>
                 </a>
             </li>
