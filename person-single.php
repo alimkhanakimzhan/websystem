@@ -125,11 +125,11 @@ else {
         </div>
           <div class="row mt-3">
               <?php
-                  if($query = $db->prepare("SELECT b.FirstName, b.LastName, relative_id, relationship_type.Name
+                  if($query = $db->prepare("SELECT b.FirstName, b.LastName, relative_id, relationship_type.Name, relationship_type.priority
                   FROM persons a INNER JOIN relatives ON relatives.person_id = a.id
                   INNER JOIN persons b ON b.id = relatives.relative_id
                   INNER JOIN relationship_type ON relatives.relationship_id = relationship_type.id
-                  WHERE person_id =$id")) {
+                  WHERE person_id =$id ORDER BY relationship_type.priority")) {
 
                   $query->execute();
                   $result = $query->get_result();
