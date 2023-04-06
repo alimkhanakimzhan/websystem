@@ -231,20 +231,78 @@ else {
                     'label' => $row['relationship_type']."\n".$row['relative_name']
                   ];
 
+<<<<<<< Updated upstream
                   $edges[] = [
                     'from' => $id,
                     'to' => $row['relative_id'],
                     'relationship_type' => $row['relationship_type'],
                   ];
+=======
+          function add_relatives_nodes($node_id, $displayed_ids, $nodes, $edges){
+
+            global $query, $db;
+            $displayed_ids_string = implode(',', $displayed_ids);
+
+            //query after UNION is added in case backward relative connection wasn't added to DB
+            if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, 
+            b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives 
+            INNER JOIN persons b ON relatives.relative_id = b.id
+            INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
+            WHERE relatives.person_id =$node_id
+            UNION 
+            SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, CONCAT(relationship_type.Name, ' человека')  as relationship_type FROM relatives
+            INNER JOIN persons b ON relatives.person_id = b.id
+            INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
+            WHERE relatives.relative_id = $node_id) as person_relatives WHERE relative_id not in ($displayed_ids_string) GROUP BY person_relatives.relative_id;")){
+              $query->execute();
+              $result = $query->get_result();
+              if($result->num_rows > 0) {
+                while ($row = $result->fetch_assoc()) {
+                  if (! empty($row)) {
+
+                    if (in_array($row['relative_id'], $displayed_ids)){
+                      continue;
+                    }
+                    array_push($displayed_ids, $row['relative_id']);
+
+                    $nodes[] = [
+                      'id' => $row['relative_id'],
+                      'name' => $row['relative_name'],
+                      'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
+                      'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
+                      'label' => $row['relationship_type']."\n".$row['relative_name']
+                    ];
+
+                    $edges[] = [
+                      'from' => $node_id,
+                      'to' => $row['relative_id'],
+                      'relationship_type' => $row['relationship_type'],
+                    ];
+                  }
+>>>>>>> Stashed changes
                 }
               }
             }
+<<<<<<< Updated upstream
           }
+=======
+
+            return array($nodes, $edges, $displayed_ids);
+          }
+
+          $network_data = add_relatives_nodes($id, $displayed_ids, $nodes, $edges);
+
+          $nodes = $network_data[0];
+          $edges = $network_data[1];
+          $displayed_ids = $network_data[2];
+
+>>>>>>> Stashed changes
         ?>
 
         <script>
               var container = document.getElementById('network');
 
+<<<<<<< Updated upstream
               var nodes = <?php echo json_encode($nodes, JSON_UNESCAPED_UNICODE) ?>;
               var edges = <?php echo json_encode($edges, JSON_UNESCAPED_UNICODE) ?>;
 
@@ -273,6 +331,12 @@ else {
                       timestep: 0.5,  // Интервал времени между расчетами физики
                       stabilization: { iterations: 2000 }  // Количество итераций стабилизации после рисования графа. Нужно для предотвращения дрожания узлов
                   },
+=======
+        var nodes = <?php echo json_encode($nodes, JSON_UNESCAPED_UNICODE) ?>;
+        var edges = <?php echo json_encode($edges, JSON_UNESCAPED_UNICODE) ?>;
+        var displayed_ids = <?php echo json_encode($displayed_ids, JSON_UNESCAPED_UNICODE) ?>;
+
+>>>>>>> Stashed changes
 
                   nodes: {
                       shape: "circularImage",
@@ -350,7 +414,67 @@ else {
      </div>
      <hr>
 
+<<<<<<< Updated upstream
      <div class="container rounded bg-white mt-5 mb-5">
+=======
+        network.on("doubleClick", function (obj) {
+          if (this.getNodeAt(obj.pointer.DOM) != undefined) {
+            var node = network.getNodeAt(obj.pointer.DOM);
+            for (i in nodes) {
+              if (nodes[i]["id"] == node) {
+                var href = nodes[i]["href"];
+                break;
+              }
+            }
+            window.open(href, '_blank');
+          }
+        });
+
+        $("#searchFurther").click(function (obj) {
+          if (chosen_node != undefined) {
+
+            $.ajax({
+              type: "POST",
+              url: "load_nodes.php", // Send the AJAX request to the same page
+              dataType: 'json',
+              cache: false,
+              data: {
+                node_id: chosen_node,
+                displayed_ids: displayed_ids,
+                nodes: nodes,
+                edges: edges
+              },
+              success: function(response) {
+                // The AJAX request was successful, do something here if needed
+
+                nodes = response.nodes;
+                edges = response.edges;
+                displayed_ids = response.displayed_ids;
+                alert(displayed_ids.length);
+                network.setData({ nodes: nodes, edges: edges });
+
+                // nodes.forEach(function(entry) {
+                //   console.log(entry);
+                // });
+
+                // edges.forEach(function(entry) {
+                //   console.log(entry);
+                // });
+
+              },
+              error: function() {
+                // The AJAX request failed, do something here if needed
+                alert("AJAX request failed");
+              }
+            });
+          }
+        });
+      </script>
+    </div>
+    <hr>
+
+    <div class="container rounded bg-white mt-5 mb-5">
+>>>>>>> Stashed changes
       <div class="d-flex justify-content-between align-items-center mb-3">
           <h4 class="text-right">Карьерная История</h4>
       </div>
