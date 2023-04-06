@@ -16,15 +16,42 @@ require_once "config.php";
   <body>
     <div class="wrapper">
       <div class="container rounded mt-5 mb-5">
-      <div id="map"></div>
+      <div class="row">
+          <div class="col-md-10 border-right">
+            <div id="map"></div>
+          </div>
+          <div class="col-md-2">
+            
+            <p> 
+            <?php
+            echo "<h1>Kazakhstan</h1>";
+            ?> 
+            </p>
+          </div>
+        </div>
+      </div>
         <style>
           #map {
             background-color: transparent !important;
-            height: 800px;
+            height: 550px;
+            width: 940px;
+
+            
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+          }
+
+          body {
+            overflow: hidden;
           }
         </style>
     <script>
+            
     
+    
+
         async function fetchData() {
             var geojson = {
                 "type": "FeatureCollection",
@@ -50,26 +77,32 @@ require_once "config.php";
 
             for (i in regions){
                 await geojson.pushgeojson(regions[i]);
-                await console.log(regions[i])
             };            
 
-            console.log(geojson);
             return geojson;
         };
 
         var map = L.map("map", {
             zoomControl: false, // убрал переключатели для увеличения карты
             scrollWheelZoom: false, // убрал мастабирование карты
-            interactive: false,
-            dragging: false,
-            doubleClickZoom: false,
-            attributionControl: false
+            interactive: false, // убрал интерактивность
+            dragging: false, // убрал захват и движение карты
+            doubleClickZoom: false, // убрал функцию увеличения карты по нажатию
+            attributionControl: false // убрал что-то 
 
         }).setView([48.5, 67.0], 5.4);
 
         async function map_interaction_main_function() {
             // добавление слоя GeoJSON на карту
             var geojson = await fetchData();
+            defaultStyle =  {
+                weight: 2,
+                opacity: 1,
+                color: "#1E90FF",
+                fillOpacity: 0.1,
+                fillColor: "#1E90FF"
+            };
+
             var geojsonLayer = L.geoJson(geojson, {
                 style: function (feature) {
                 return {
@@ -82,20 +115,51 @@ require_once "config.php";
                 }
             }).addTo(map);
 
-            // установка обработчика событий на клик по области
             geojsonLayer.eachLayer(function (layer) {
-                layer.on("click", function () {
                 // выполнение действий при клике на область
-                console.log("Клик по области " + layer.feature.properties.name);
+                layer.on("click", function () {
+                  var regionName = layer.feature.properties.name;
+                  document.querySelector("h1").textContent = regionName;
+
+                    map.fitBounds(layer.getBounds()); // зумируем на выбранный регион
+                    geojsonLayer.setStyle(function(feature) {
+                        if (feature == layer.feature) {
+                            return {
+                                weight: 2,
+                                opacity: 1,
+                                color: "#1E90FF",
+                                fillOpacity: 0.1,
+                                fillColor: "#1E90FF"
+                            }
+                        } else {
+                            return {
+                                weight: 2,
+                                opacity: 1,
+                                color: "#000000",
+                                fillOpacity: 0.5,
+                                fillColor: "#000000"
+                            }
+                        }
+                    });
                 });
+
+                // выполнение действий при двойном клике
+                layer.on("dblclick", function () {
+                // Переход на координаты [48.5, 67.0], зум 5.4
+                map.setView([48.5, 67.0], 5);
+                geojsonLayer.setStyle(defaultStyle);
+                document.querySelector("h1").textContent = 'Kazakhstan';
+              });
             });
+            
             
             // часть кода что обрабатывает увеличение масштаба
             // map.on('zoomend', function() {
             //     var zoom = map.getZoom();
             //     console.log('Zoom level: ' + zoom);
             // });
-
+            // Создаем окружность с начальными координатами
+            
             return geojsonLayer;
         }
 
