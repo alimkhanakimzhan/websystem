@@ -20,7 +20,7 @@ else {
   <body>
     <div class="wrapper">
       <div class="container rounded mt-5 mb-5">
-        <a href=users_adduser.php> <span>Add new user</span> </a>
+        <a href=users_adduser.php> <span>+ Add new user</span> </a>
         <?php
         $query = $db->prepare("SELECT * FROM `users`");
 

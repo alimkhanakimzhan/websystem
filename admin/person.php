@@ -63,6 +63,10 @@ else {
       </form>
       <!-- search form end-->
 
+
+      <a href="add-person.php">+ Add Person</a>
+
+
       <?php
           $search_field_parameter = isset($_GET['search-field']) ? $_GET['search-field'] : '';
           $firstName_request = isset($_GET['FirstName']) ? $_GET['FirstName'] : '';

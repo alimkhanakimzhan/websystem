@@ -196,7 +196,7 @@ else {
             'href' => 'person-single.php?id=' . $id,
             'label' => '<b>' . $FirstName . ' ' . $LastName . '</b>',
             'font' => [
-              'multi' =>  "html", 
+              'multi' =>  "html",
               'size' =>  20
             ]
           ];
@@ -206,8 +206,8 @@ else {
           //query after UNION is added in case backward relative connection wasn't added to DB
           if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives INNER JOIN persons b ON relatives.relative_id = b.id
           INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-          WHERE relatives.person_id =$id 
-          UNION 
+          WHERE relatives.person_id =$id
+          UNION
           SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, CONCAT(relationship_type.Name, ' человека')  as relationship_type FROM relatives
           INNER JOIN persons b ON relatives.person_id = b.id
           INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
