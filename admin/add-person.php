@@ -14,12 +14,7 @@ else {
   }
 }
 
-
-if(!isset($_GET['id'])) {
-  header("location: person.php");
-}
-else {
-  $id = $_GET['id'];
+  $id = 53;
   if($query = $db->prepare("SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name as Gender, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as Nationality
   FROM persons LEFT JOIN gender ON gender.id = persons.GenderID
   LEFT JOIN regions ON regions.id = persons.birth_region_id
@@ -45,7 +40,7 @@ else {
       header("Location:  index.php");
       exit;
     }
-}
+
 ?>
 <html>
   <?php require_once(HOME_DIR.'/include/header.php') ?>
