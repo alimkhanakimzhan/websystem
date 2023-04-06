@@ -16,11 +16,16 @@ require_once "config.php";
   <body>
     <div class="wrapper">
       <div class="container rounded mt-5 mb-5">
+<<<<<<< HEAD
       <div class="row">
+=======
+        <div class="row">
+>>>>>>> 9f9abb4b33ae34cb1a15e0883c6f3e01604f2ece
           <div class="col-md-10 border-right">
             <div id="map"></div>
           </div>
           <div class="col-md-2">
+<<<<<<< HEAD
             
             <p> 
             <?php
@@ -51,6 +56,18 @@ require_once "config.php";
             
     
     
+=======
+            <p>TEXT</p>
+          </div>
+        </div>
+        <style>
+          #map {
+            background-color: transparent !important;
+            height: 700px;
+          }
+        </style>
+    <script>
+>>>>>>> 9f9abb4b33ae34cb1a15e0883c6f3e01604f2ece
 
         async function fetchData() {
             var geojson = {
@@ -63,21 +80,26 @@ require_once "config.php";
                 this.features.push(...json.features);
             };
 
-            const regions = ['1__astana.geojson', '2__almaty.geojson', 
+            const regions = ['1__astana.geojson', '2__almaty.geojson',
             'karagandyprovince.geojson',
-             '5__akmolaprovince.geojson', '6__aktobeprovince.geojson', 
-            '7__almatyprovince.geojson', '8__atyrauprovince.geojson', 
-            '9__eastkazakhstan.geojson', 
-            '10__jambylprovince.geojson', 
+             '5__akmolaprovince.geojson', '6__aktobeprovince.geojson',
+            '7__almatyprovince.geojson', '8__atyrauprovince.geojson',
+            '9__eastkazakhstan.geojson',
+            '10__jambylprovince.geojson',
             '12__westkazakhstan.geojson',
-            '14__kostanayprovince.geojson', '15__kyzylordaprovince.geojson', 
-            '16__mangystauprovince.geojson', '17__pavlodar.geojson', '18__northkazakhstan.geojson', 
-            '19__turkistanprovince.geojson', 
+            '14__kostanayprovince.geojson', '15__kyzylordaprovince.geojson',
+            '16__mangystauprovince.geojson', '17__pavlodar.geojson', '18__northkazakhstan.geojson',
+            '19__turkistanprovince.geojson',
             ];
 
             for (i in regions){
                 await geojson.pushgeojson(regions[i]);
+<<<<<<< HEAD
             };            
+=======
+                await console.log(regions[i])
+            };
+>>>>>>> 9f9abb4b33ae34cb1a15e0883c6f3e01604f2ece
 
             return geojson;
         };
@@ -151,8 +173,12 @@ require_once "config.php";
                 document.querySelector("h1").textContent = 'Kazakhstan';
               });
             });
+<<<<<<< HEAD
             
             
+=======
+
+>>>>>>> 9f9abb4b33ae34cb1a15e0883c6f3e01604f2ece
             // часть кода что обрабатывает увеличение масштаба
             // map.on('zoomend', function() {
             //     var zoom = map.getZoom();
@@ -167,9 +193,9 @@ require_once "config.php";
             var geojsonLayer = await map_interaction_main_function();
 
           // Do something with the GeoJSON layer
-        })();    
+        })();
     </script>
-  
+
       </div>
     </div>
 
