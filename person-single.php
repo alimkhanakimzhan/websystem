@@ -250,13 +250,14 @@ else {
                       'name' => $row['relative_name'],
                       'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
                       'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
-                      'label' => $row['relationship_type']."\n".$row['relative_name']
+                      'label' => $row['relative_name']
                     ];
 
                     $edges[] = [
                       'from' => $node_id,
                       'to' => $row['relative_id'],
                       'relationship_type' => $row['relationship_type'],
+                      'label' => $row['relationship_type']
                     ];
                   }
                 }
@@ -339,8 +340,28 @@ else {
           },
 
           edges: {
+            arrows: {
+              to: {
+                enabled: true,
+                scaleFactor: 1,
+                type: "arrow"
+              }
+            },
+            font: {
+              color: '#0f5587',
+              size: 16, // px
+              face: 'arial',
+              background: 'none',
+              strokeWidth: 2, // px
+              strokeColor: '#ffffff',
+              align: 'horizontal',
+              multi: false,
+              vadjust: 0,
+
+            },
             size: 40,
             length: 400,
+            
             smooth: {
               type: 'continuous'
             },
@@ -402,7 +423,7 @@ else {
                 nodes = response.nodes;
                 edges = response.edges;
                 displayed_ids = response.displayed_ids;
-                alert(displayed_ids.length);
+                // alert(displayed_ids.length);
                 network.setData({ nodes: nodes, edges: edges });
 
                 // nodes.forEach(function(entry) {

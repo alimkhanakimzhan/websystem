@@ -44,13 +44,14 @@
                       'name' => $row['relative_name'],
                       'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
                       'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
-                      'label' => $row['relationship_type']."\n".$row['relative_name']
+                      'label' => $row['relative_name']
                     ];
 
                     $edges[] = [
                       'from' => $node_id,
                       'to' => $row['relative_id'],
                       'relationship_type' => $row['relationship_type'],
+                      'label' => $row['relationship_type']
                     ];
                   }
                 }
