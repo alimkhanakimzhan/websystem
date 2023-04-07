@@ -1,7 +1,7 @@
 <?php
     // start the session
     session_start();
-    
+
     // Check if the user is not logged in, then redirect the user to login page
     if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
         header("location: login.php");
@@ -19,7 +19,7 @@
 
             global $query, $db;
             $displayed_ids_string = implode(',', $displayed_ids);
-            $is_on = [$node_id => "NO"]; // есть ли человек на графике
+            // $is_on = [$node_id => "NO"]; // есть ли человек на графике
 
             //query after UNION is added in case backward relative connection wasn't added to DB
             if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, 
@@ -36,37 +36,51 @@
               $result = $query->get_result();
               if($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
+                  $relative_id = $row['relative_id'];
+                  $relative_name = $row['relative_name'];
+                  $relative_photo = $row['relative_photo'];
+                  $relationship_type =  $row['relationship_type'];
+
                   if (! empty($row)) {
 
-                    if (in_array($row['relative_id'], $displayed_ids)){
-                        $is_on[] = [$row['relative_id'] => "YES"];
+                    if (in_array($relative_id, $displayed_ids)){
+                        // $is_on[] = [$relative_id => "YES"];  // wrote this chunk of code to avoid 2 arrows in both directions (between 2 people)
+                        // foreach ($edges as $edge) {
+                        //   if ($edge['from'] == $relative_id && $edge['to'] == $node_id) {
+                        //       $relative_edge = $edge;
+                        //       break;
+                        //   }
+                        // }
+
+                        // if (!($relationship_type == $relative_edge['label']) || !(($relationship_type.' человека') == $relative_edge['label'])){}
+    
                         $edges[] = [
                           'from' => $node_id,
-                          'to' => $row['relative_id'],
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => $row['relationship_type']
+                          'to' => $relative_id,
+                          'relationship_type' => $relationship_type,
+                          'label' => $relationship_type
                         ];
                         continue;
                     }
 
-                    $is_on[] = [$row['relative_id'] => "NO"];
-                    array_push($displayed_ids, $row['relative_id']);
+                    // $is_on[] = $relative_id => "NO"];
+                    array_push($displayed_ids, $relative_id);
                     
 
 
                     $nodes[] = [
-                      'id' => $row['relative_id'],
-                      'name' => $row['relative_name'],
-                      'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
-                      'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
-                      'label' => $row['relative_name']
+                      'id' => $relative_id,
+                      'name' => $relative_name,
+                      'image' => 'images/avatars/persons/' . (($relative_photo=='')?'default_icon.png':$relative_photo),
+                      'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $relative_id )),
+                      'label' => $relative_name
                     ];
 
                     $edges[] = [
                       'from' => $node_id,
-                      'to' => $row['relative_id'],
-                      'relationship_type' => $row['relationship_type'],
-                      'label' => $row['relationship_type']
+                      'to' => $relative_id,
+                      'relationship_type' => $relationship_type,
+                      'label' => $relationship_type
                     ];
                   }
                 }
@@ -75,8 +89,7 @@
 
             return array("displayed_ids" => $displayed_ids,
                         "nodes" => $nodes,
-                        "edges" => $edges,
-                        "is_on" => $is_on);
+                        "edges" => $edges);
           }
 
 
