@@ -1,5 +1,12 @@
 <?php
-
+    // start the session
+    session_start();
+    
+    // Check if the user is not logged in, then redirect the user to login page
+    if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+        header("location: login.php");
+        exit;
+    }
     require_once "config.php";
 
     if (isset($_POST['node_id']) && isset($_POST['displayed_ids']) && isset($_POST['nodes']) && isset($_POST['edges'])) {
