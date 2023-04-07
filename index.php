@@ -19,7 +19,7 @@ require_once "config.php";
         <p class="text-center">
           Добро Пожаловать, <u><?php echo $_SESSION["nickname"];?></u>!
         </p>
-        WebSystem v.2.0 by alimkh_n
+        WebSystem v.2.0 by alimkhanakimzhan, Temirlan-Tazhibayev, ZakirMaradzhapov
       </div>
     </div>
 
