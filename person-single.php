@@ -197,8 +197,11 @@ else {
     </div>
 
     <div class="container rounded bg-white mt-5 mb-5">
-      <button class="btn btn-primary" name="searchFurther" id="searchFurther">Найти родственников</button>
+      <div class="mt-5 text-center">
+      <button class="btn btn-primary" name="searchFurther" id="searchFurther" style="border-color: rgba(56,207,21,.95); background-color: transparent; color: rgba(56,207,21,.95); box-shadow:0 0 0px 1px;">Найти родственников</button>
+      </div>
       <div id="network"></div>
+
       <?php
           $nodes[] = [
             'id' => $id,
@@ -207,7 +210,7 @@ else {
             'href' => 'person-single.php?id=' . $id,
             'label' => '<b>' . $FirstName . ' ' . $LastName . '</b>',
             'font' => [
-              'multi' =>  "html", 
+              'multi' =>  "html",
               'size' =>  20
             ]
           ];
@@ -224,12 +227,12 @@ else {
             $displayed_ids_string = implode(',', $displayed_ids);
 
             //query after UNION is added in case backward relative connection wasn't added to DB
-            if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, 
-            b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives 
+            if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name,
+            b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives
             INNER JOIN persons b ON relatives.relative_id = b.id
             INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
             WHERE relatives.person_id =$node_id
-            UNION 
+            UNION
             SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, CONCAT(relationship_type.Name, ' человека')  as relationship_type FROM relatives
             INNER JOIN persons b ON relatives.person_id = b.id
             INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
@@ -361,7 +364,7 @@ else {
             },
             size: 40,
             length: 400,
-            
+
             smooth: {
               type: 'continuous'
             },
