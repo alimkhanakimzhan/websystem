@@ -241,26 +241,31 @@ else {
               $result = $query->get_result();
               if($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
+                  $relative_id = $row['relative_id'];
+                  $relative_name = $row['relative_name'];
+                  $relative_photo = $row['relative_photo'];
+                  $relationship_type =  $row['relationship_type'];
+
                   if (! empty($row)) {
 
-                    if (in_array($row['relative_id'], $displayed_ids)){
+                    if (in_array($relative_id, $displayed_ids)){
                       continue;
                     }
-                    array_push($displayed_ids, $row['relative_id']);
+                    array_push($displayed_ids, $relative_id);
 
                     $nodes[] = [
-                      'id' => $row['relative_id'],
-                      'name' => $row['relative_name'],
-                      'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
-                      'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $row['relative_id'] )),
-                      'label' => $row['relative_name']
+                      'id' => $relative_id,
+                      'name' => $relative_name,
+                      'image' => 'images/avatars/persons/' . (($relative_photo=='')?'default_icon.png':$relative_photo),
+                      'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $relative_id )),
+                      'label' => $relative_name
                     ];
 
                     $edges[] = [
                       'from' => $node_id,
-                      'to' => $row['relative_id'],
-                      'relationship_type' => $row['relationship_type'],
-                      'label' => $row['relationship_type']
+                      'to' => $relative_id,
+                      'relationship_type' => $relationship_type,
+                      'label' => $relationship_type
                     ];
                   }
                 }
@@ -411,7 +416,7 @@ else {
 
             $.ajax({
               type: "POST",
-              url: "load_nodes.php", // Send the AJAX request to the same page
+              url: "load_nodes.php", // Send the AJAX request
               dataType: 'json',
               cache: false,
               data: {
@@ -428,19 +433,10 @@ else {
                 displayed_ids = response.displayed_ids;
                 // alert(displayed_ids.length);
                 network.setData({ nodes: nodes, edges: edges });
-
-                // nodes.forEach(function(entry) {
-                //   console.log(entry);
-                // });
-
-                // edges.forEach(function(entry) {
-                //   console.log(entry);
-                // });
-
               },
               error: function() {
                 // The AJAX request failed, do something here if needed
-                alert("AJAX request failed");
+                alert("Что-то пошло не так (AJAX request failed)");
               }
             });
 
