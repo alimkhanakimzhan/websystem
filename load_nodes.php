@@ -19,68 +19,54 @@
 
             global $query, $db;
             $displayed_ids_string = implode(',', $displayed_ids);
-            // $is_on = [$node_id => "NO"]; // есть ли человек на графике
+            $is_on = [$node_id => "NO"]; // есть ли человек на графике
 
             //query after UNION is added in case backward relative connection wasn't added to DB
-            if($query = $db->prepare("SELECT relative_id, relative_name, relative_photo, relationship_type FROM (SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, 
-            b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives 
-            INNER JOIN persons b ON relatives.relative_id = b.id
+            if($query = $db->prepare("SELECT relative_iin, relative_name, relative_photo, relationship_type FROM (SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name,
+            b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives
+            INNER JOIN persons b ON relatives.relative_iin = b.IIN
             INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-            WHERE relatives.person_id =$node_id
-            UNION 
-            SELECT b.id as relative_id, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, CONCAT(relationship_type.Name, ' человека')  as relationship_type FROM relatives
-            INNER JOIN persons b ON relatives.person_id = b.id
+            WHERE relatives.person_iin =$node_id AND CONCAT(b.LastName, ' ' ,b.FirstName) != ''
+            UNION
+            SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, CONCAT(relationship_type.Name)  as relationship_type FROM relatives
+            INNER JOIN persons b ON relatives.person_iin = b.IIN
             INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-            WHERE relatives.relative_id = $node_id) as person_relatives GROUP BY person_relatives.relative_id;")){
+            WHERE relatives.relative_iin = $node_id AND CONCAT(b.LastName, ' ' ,b.FirstName) != '') as person_relatives GROUP BY person_relatives.relative_iin;")){
               $query->execute();
               $result = $query->get_result();
               if($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
-                  $relative_id = $row['relative_id'];
-                  $relative_name = $row['relative_name'];
-                  $relative_photo = $row['relative_photo'];
-                  $relationship_type =  $row['relationship_type'];
-
                   if (! empty($row)) {
 
-                    if (in_array($relative_id, $displayed_ids)){
-                        // $is_on[] = [$relative_id => "YES"];  // wrote this chunk of code to avoid 2 arrows in both directions (between 2 people)
-                        // foreach ($edges as $edge) {
-                        //   if ($edge['from'] == $relative_id && $edge['to'] == $node_id) {
-                        //       $relative_edge = $edge;
-                        //       break;
-                        //   }
-                        // }
-
-                        // if (!($relationship_type == $relative_edge['label']) || !(($relationship_type.' человека') == $relative_edge['label'])){}
-    
+                    if (in_array($row['relative_iin'], $displayed_ids)){
+                        $is_on[] = [$row['relative_iin'] => "YES"];
                         $edges[] = [
                           'from' => $node_id,
-                          'to' => $relative_id,
-                          'relationship_type' => $relationship_type,
-                          'label' => $relationship_type
+                          'to' => $row['relative_iin'],
+                          'relationship_type' => $row['relationship_type'],
+                          'label' => $row['relationship_type']
                         ];
                         continue;
                     }
 
-                    // $is_on[] = $relative_id => "NO"];
-                    array_push($displayed_ids, $relative_id);
-                    
+                    $is_on[] = [$row['relative_iin'] => "NO"];
+                    array_push($displayed_ids, $row['relative_iin']);
+
 
 
                     $nodes[] = [
-                      'id' => $relative_id,
-                      'name' => $relative_name,
-                      'image' => 'images/avatars/persons/' . (($relative_photo=='')?'default_icon.png':$relative_photo),
-                      'href' => 'person-single.php?id=' . strtolower(str_replace(' ', '', $relative_id )),
-                      'label' => $relative_name
+                      'id' => $row['relative_iin'],
+                      'name' => $row['relative_name'],
+                      'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
+                      'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $row['relative_iin'] )),
+                      'label' => $row['relative_name']
                     ];
 
                     $edges[] = [
                       'from' => $node_id,
-                      'to' => $relative_id,
-                      'relationship_type' => $relationship_type,
-                      'label' => $relationship_type
+                      'to' => $row['relative_iin'],
+                      'relationship_type' => $row['relationship_type'],
+                      'label' => $row['relationship_type']
                     ];
                   }
                 }
@@ -89,7 +75,8 @@
 
             return array("displayed_ids" => $displayed_ids,
                         "nodes" => $nodes,
-                        "edges" => $edges);
+                        "edges" => $edges,
+                        "is_on" => $is_on);
           }
 
 

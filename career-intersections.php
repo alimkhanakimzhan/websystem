@@ -18,7 +18,7 @@ require_once "config.php";
     <div class="container rounded bg-white mt-5 mb-5">
     <div id="graph"></div>
     <?php
-      $id = $_GET['id'];
+      $iin = $_GET['iin'];
       $organization_ID = $_GET['organization_id'];
       $start_period = $_GET['start_period'];
       $end_period = $_GET['end_period'];
@@ -29,19 +29,19 @@ require_once "config.php";
 
       if($query = $db->prepare("
       SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
-      co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_id, co_workers.Photo,
+      co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_iin, co_workers.Photo,
       co_workers.time_start_position, co_workers.time_end_position
       FROM job_history
-      JOIN persons ON job_history.person_id = persons.id
+      JOIN persons ON job_history.person_iin = persons.iin
       LEFT JOIN (
-      SELECT persons.FirstName, persons.LastName, job_history.person_id, job_history.position_name, persons.Photo,
+      SELECT persons.FirstName, persons.LastName, job_history.person_iin, job_history.position_name, persons.Photo,
       job_history.time_start_position, job_history.time_end_position
       FROM job_history
-      JOIN persons ON job_history.person_id = persons.id
+      JOIN persons ON job_history.person_iin = persons.iin
       WHERE job_history.organization_ID = $organization_ID
       AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period'
-      ) co_workers ON co_workers.person_id != job_history.person_id
-      WHERE job_history.person_id = $id
+      ) co_workers ON co_workers.person_iin != job_history.person_iin
+      WHERE job_history.person_iin = $iin
       AND job_history.organization_ID = $organization_ID
       AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ORDER BY co_workers.time_start_position ASC;"))
       {
@@ -112,10 +112,10 @@ require_once "config.php";
     </script>
 
       <?php
-        if(!isset($_GET['id'])) {
+        if(!isset($_GET['iin'])) {
           header("location: person.php");
         } else {
-          $id = $_GET['id'];
+          $iin = $_GET['iin'];
           $organization_ID = $_GET['organization_id'];
           $start_period = $_GET['start_period'];
           $end_period = $_GET['end_period'];
@@ -129,19 +129,19 @@ require_once "config.php";
 
           if($query = $db->prepare("
           SELECT persons.FirstName, persons.LastName, job_history.position_name, co_workers.FirstName as CoWorkerFirstName,
-          co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_id, co_workers.Photo,
+          co_workers.LastName as CoWorkerLastName, co_workers.position_name, co_workers.person_iin, co_workers.Photo,
           co_workers.time_start_position, co_workers.time_end_position
           FROM job_history
-          JOIN persons ON job_history.person_id = persons.id
+          JOIN persons ON job_history.person_iin = persons.iin
           LEFT JOIN (
-          SELECT persons.FirstName, persons.LastName, job_history.person_id, job_history.position_name, persons.Photo,
+          SELECT persons.FirstName, persons.LastName, job_history.person_iin, job_history.position_name, persons.Photo,
           job_history.time_start_position, job_history.time_end_position
           FROM job_history
-          JOIN persons ON job_history.person_id = persons.id
+          JOIN persons ON job_history.person_iin = persons.iin
           WHERE job_history.organization_ID = $organization_ID
           AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period'
-          ) co_workers ON co_workers.person_id != job_history.person_id
-          WHERE job_history.person_id = $id
+          ) co_workers ON co_workers.person_iin != job_history.person_iin
+          WHERE job_history.person_iin = $iin
           AND job_history.organization_ID = $organization_ID
           AND job_history.time_start_position BETWEEN '$start_period' AND '$end_period' ORDER BY co_workers.time_start_position ASC ;"))
           {
@@ -174,10 +174,10 @@ require_once "config.php";
                           <div class="img" style="background-image: url('.'images/avatars/persons/' . $row["Photo"].');"></div>
                         </td>
                         <td class="">
-                          <a href="person-single.php?id='.$row['person_id'].'"><span>'.$row['CoWorkerLastName'].'</span></a>
+                          <a href="person-single.php?id='.$row['person_iin'].'"><span>'.$row['CoWorkerLastName'].'</span></a>
                         </td>
                         <td class="">
-                          <a href="person-single.php?id='.$row['person_id'].'"><span>'.$row['CoWorkerFirstName'].'</span></a>
+                          <a href="person-single.php?id='.$row['person_iin'].'"><span>'.$row['CoWorkerFirstName'].'</span></a>
                         </td>
                         <td class="">
                           <span>'.$row['position_name'].'</span>
@@ -191,7 +191,7 @@ require_once "config.php";
                       $FirstName = $row['CoWorkerFirstName'];
                       $LastName = $row['CoWorkerLastName'];
                       $Position = $row['position_name'];
-                      $coworker_id = $row['person_id'];
+                      $coworker_id = $row['person_iin'];
                       $Photo = 'images/avatars/persons/' . $row["Photo"];
                       $coworker_start_period = $row['time_start_position'];
                       $coworker_end_period = $row['time_end_position'];

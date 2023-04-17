@@ -18,7 +18,7 @@ require_once "config.php";
       <div class="container rounded bg-white mt-5 mb-5">
 
 
-<!-- search form start-->
+        <!-- search form start-->
         <form class="container" action="biperson-intersections.php" method="GET">
           <div class="row d-flex justify-content-center">
             <div class="col-md-10">
@@ -39,7 +39,9 @@ require_once "config.php";
             </div>
           </div>
         </form>
-<!-- search form end-->
+        <!-- search form end-->
+
+
         <div class="container">
           <div class="row d-flex justify-content-center">
             <div class="col-md-9">
@@ -47,45 +49,43 @@ require_once "config.php";
 
 
               // Function to retrieve information about a person given their IIN
-              function getPerson($db, $IIN) {
-                  $query = "SELECT * FROM persons WHERE IIN = '$IIN'";
-                  $result = mysqli_query($db, $query);
-                  if (mysqli_num_rows($result) > 0) {
-                      return mysqli_fetch_assoc($result);
-                  } else {
-                      return null;
-                  }
-              }
+                function getPerson($db, $iin) {
+                    $query = "SELECT * FROM persons WHERE IIN = '$iin'";
+                    $result = mysqli_query($db, $query);
+                    if (mysqli_num_rows($result) > 0) {
+                        return mysqli_fetch_assoc($result);
+                    } else {
+                        return null;
+                    }
+                }
 
+                // function getPersonByID($db, $iin) {
+                //     $query = "SELECT * FROM persons WHERE IIN = '$iin'";
+                //     $result = mysqli_query($db, $query);
+                //     if (mysqli_num_rows($result) > 0) {
+                //         return mysqli_fetch_assoc($result);
+                //     } else {
+                //         return null;
+                //     }
+                // }
 
-
-              function getPersonByID($db, $id) {
-                  $query = "SELECT * FROM persons WHERE id = '$id'";
-                  $result = mysqli_query($db, $query);
-                  if (mysqli_num_rows($result) > 0) {
-                      return mysqli_fetch_assoc($result);
-                  } else {
-                      return null;
-                  }
-              }
-
-              // Function to retrieve a list of relatives for a given person
-              function getRelatives($db, $person_id) {
-                  $relatives = array();
-                  $query = "SELECT * FROM relatives WHERE person_id = '$person_id'";
-                  $result = mysqli_query($db, $query);
-                  if (mysqli_num_rows($result) > 0) {
-                      while ($row = mysqli_fetch_assoc($result)) {
-                          $relatives[] = $row;
-                      }
-                  }
-                  return $relatives;
-              }
+                // Function to retrieve a list of relatives for a given person
+                function getRelatives($db, $person_iin) {
+                    $relatives = array();
+                    $query = "SELECT * FROM relatives WHERE person_iin = '$person_iin'";
+                    $result = mysqli_query($db, $query);
+                    if (mysqli_num_rows($result) > 0) {
+                        while ($row = mysqli_fetch_assoc($result)) {
+                            $relatives[] = $row;
+                        }
+                    }
+                    return $relatives;
+                }
 
               // Function to retrieve a list of job histories for a given person
-              function getJobHistories($db, $person_id) {
+              function getJobHistories($db, $person_iin) {
                   $job_histories = array();
-                  $query = "SELECT * FROM job_history WHERE person_id = '$person_id'";
+                  $query = "SELECT * FROM job_history WHERE person_iin = '$person_iin'";
                   $result = mysqli_query($db, $query);
                   if (mysqli_num_rows($result) > 0) {
                       while ($row = mysqli_fetch_assoc($result)) {
@@ -96,11 +96,11 @@ require_once "config.php";
               }
 
               // Function to compare two people's job histories
-              function compareJobHistories($person1_id, $person2_id) {
+              function compareJobHistories($person1_iin, $person2_iin) {
                   global $db;
-                  if(($person1_id!=0 OR $person2_id!=0) AND ($person1_id != $person2_id)){
-                    $person1_histories = getJobHistories($db, $person1_id);
-                    $person2_histories = getJobHistories($db, $person2_id);
+                  if(($person1_iin!=0 OR $person2_iin!=0) AND ($person1_iin != $person2_iin)){
+                    $person1_histories = getJobHistories($db, $person1_iin);
+                    $person2_histories = getJobHistories($db, $person2_iin);
                     foreach ($person1_histories as $history1) {
                         foreach ($person2_histories as $history2) {
                             if ($history1['organization_id'] == $history2['organization_id']) {
@@ -114,26 +114,26 @@ require_once "config.php";
 
 
               // Function to find all relations between two people
-              function findRelations($db, $person1_id, $person2_id) {
-                  $person1_relatives = getRelatives($db, $person1_id);
-                  $person2_relatives = getRelatives($db, $person2_id);
-                  $person1 = getPersonByID($db, $person1_id);
-                  $person2 = getPersonByID($db, $person2_id);
+              function findRelations($db, $person1_iin, $person2_iin) {
+                  $person1_relatives = getRelatives($db, $person1_iin);
+                  $person2_relatives = getRelatives($db, $person2_iin);
+                  $person1 = getPerson($db, $person1_iin);
+                  $person2 = getPerson($db, $person2_iin);
 
-                  if (compareJobHistories($person1_id, $person2_id)) {
+                  if (compareJobHistories($person1_iin, $person2_iin)) {
                       echo 'Прямые карьерные пересечения найдены у '.$person1['FirstName'].' '.$person1['LastName'].' and '.$person2['FirstName'].' '.$person2['LastName'].'';
                       echo '<br>';
                   }
                   foreach ($person1_relatives as $relative1) {
-                    $relative1_as_person = getPersonByID($db, $relative1['relative_id']);
-                      if (compareJobHistories($relative1['relative_id'], $person2_id)) {
+                    $relative1_as_person = getPerson($db, $relative1['relative_iin']);
+                      if (compareJobHistories($relative1['relative_iin'], $person2_iin)) {
                           echo 'Карьерные пересечения найдены у '.$relative1_as_person['FirstName'].' (Родственник '.$person1['FirstName'].' '.$person1['LastName'].') and '.$person2['FirstName'].' '.$person2['LastName'].'';
                           echo '<br>';
                       }
                   }
                   foreach ($person2_relatives as $relative2) {
-                    $relative2_as_person = getPersonByID($db, $relative2['relative_id']);
-                      if (compareJobHistories($person1_id, $relative2['relative_id'])) {
+                    $relative2_as_person = getPerson($db, $relative2['relative_iin']);
+                      if (compareJobHistories($person1_iin, $relative2['relative_iin'])) {
                           echo 'Карьерные пересечения найдены у '.$person1['FirstName'].' '.$person1['LastName'].' and '.$relative2_as_person['FirstName'].' (Родственник '.$person2['FirstName'].' '.$person2['LastName'].')';
                           echo '<br>';
                       }
@@ -142,8 +142,8 @@ require_once "config.php";
 
                   foreach ($person1_relatives as $relative1) { //CHANGE IT THEN когда в персонах не будет дубликатов
                     foreach ($person2_relatives as $relative2) {
-                      $relative1_as_person = getPersonByID($db, $relative1['relative_id']);
-                      $relative2_as_person = getPersonByID($db, $relative2['relative_id']);
+                      $relative1_as_person = getPerson($db, $relative1['relative_iin']);
+                      $relative2_as_person = getPerson($db, $relative2['relative_iin']);
                         if ($relative1_as_person['FirstName'] == $relative2_as_person['FirstName'] AND $relative1_as_person['LastName'] == $relative2_as_person['LastName'] ) {
                             echo "Общие родственные связи с: " . $relative1_as_person['FirstName'] . ' ' . $relative1_as_person['LastName'] ."<br>";
                         }
@@ -162,9 +162,10 @@ require_once "config.php";
               $person1 = getPerson($db, $IIN1);
               $person2 = getPerson($db, $IIN2);
 
+
               if ($person1 && $person2) {
                   echo 'Поиск отношений между '.$person1['FirstName'].' '.$person1['LastName'].' и '.$person2['FirstName'].' '.$person2['LastName'].' <br>';
-                  findRelations($db, $person1['id'], $person2['id']);
+                  findRelations($db, $person1['IIN'], $person2['IIN']);
               } else {
                   echo "Either one or both of the persons with given IINs do not exist in the database\n";
               }
