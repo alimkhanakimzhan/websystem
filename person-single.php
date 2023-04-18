@@ -65,461 +65,413 @@ else {
               <h4 class="text-right">Личные данные</h4>
             </div>
             <div class="row mt-2">
-              <div class="col-md-12"><label class="labels">ИИН</label><input type="text" class="form-control"
-                  placeholder="<?php echo $iin; ?>" value="" readonly></div>
-              <div class="col-md-12"><label class="labels">ФИО</label><input type="text" class="form-control" value=""
-                  placeholder="<?php echo $LastName; echo " "; echo $FirstName; echo " "; if($Patronymic != "NULL" ) echo $Patronymic ?>"
-                  readonly></div>
-              <div class="col-md-12"><label class="labels">Место Рождения</label><input type="text" class="form-control"
-                  value="" placeholder="<?php echo $PlaceOfBirth; ?>" readonly></div>
+              <div class="col-md-12">
+                <label class="labels">ИИН</label>
+                <input type="text" class="form-control" placeholder="<?php echo $iin; ?>" value="" readonly>
+              </div>
+              <div class="col-md-12">
+                <label class="labels">ФИО</label>
+                <input type="text" class="form-control" value="" placeholder="<?php echo $LastName; echo " "; echo $FirstName; echo " "; if($Patronymic != "NULL" ) echo $Patronymic ?>" readonly>
+              </div>
+              <div class="col-md-12">
+                <label class="labels">Место Рождения</label>
+                <input type="text" class="form-control" value="" placeholder="<?php echo $PlaceOfBirth; ?>" readonly>
+              </div>
             </div>
             <div class="row mt-3">
-              <div class="col-md-12"><label class="labels">Национальность</label><input type="text" class="form-control"
-                  placeholder="<?php echo $Nationality; ?>" value="" readonly></div>
-              <div class="col-md-12"><label class="labels">Пол</label><input type="text" class="form-control"
-                  placeholder="<?php echo $Gender; ?>" value="" readonly></div>
-              <div class="col-md-12"><label class="labels">Дата Рождения</label><input type="text" class="form-control"
-                  placeholder="<?php echo $BirthDate; ?>" value="" readonly></div>
+              <div class="col-md-12">
+                <label class="labels">Национальность</label>
+                <input type="text" class="form-control" placeholder="<?php echo $Nationality; ?>" value="" readonly>
+              </div>
+              <div class="col-md-12">
+                <label class="labels">Пол</label>
+                <input type="text" class="form-control" placeholder="<?php echo $Gender; ?>" value="" readonly>
+              </div>
+              <div class="col-md-12">
+                <label class="labels">Дата Рождения</label>
+                <input type="text" class="form-control" placeholder="<?php echo $BirthDate; ?>" value="" readonly>
+              </div>
             </div>
             <!-- <div class="mt-5 text-center"><button class="btn btn-primary profile-button" type="button">Save Profile</button></div> -->
           </div>
         </div>
+
         <div class="col-md-4">
           <div class="p-3 py-5">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h4 class="text-right">Текущая работа</h4>
             </div>
             <?php
-                if($query = $db->prepare("SELECT time_start_position, time_end_position, position_name, organization_list.name as organization_name FROM `job_history` INNER JOIN persons on persons.IIN=job_history.person_iin
-                                          INNER JOIN organization_list on organization_ID=organization_list.id
-                                          WHERE person_iin = $iin and time_end_position = '0000-00-00 00:00' ORDER BY time_start_position DESC
-                                          LIMIT 1")) {
-                  $query->execute();
-                  $result = $query->get_result();
-                  if($result->num_rows > 0) {
+              if($query = $db->prepare("SELECT time_start_position, time_end_position, position_name, organization_list.name as organization_name FROM `job_history` INNER JOIN persons on persons.IIN=job_history.person_iin
+              INNER JOIN organization_list on organization_ID=organization_list.id
+              WHERE person_iin = $iin and time_end_position = '0000-00-00 00:00' ORDER BY time_start_position DESC
+              LIMIT 1")) {
+                $query->execute();
+                $result = $query->get_result();
+                if($result->num_rows > 0) {
                   while ($row = $result->fetch_assoc()) {
-                      $time_start_position = $row["time_start_position"];
-                      $organization_name = $row["organization_name"];
-                      $position_name = $row["position_name"];
+                    $time_start_position = $row["time_start_position"];
+                    $organization_name = $row["organization_name"];
+                    $position_name = $row["position_name"];
 
-                      echo '
-                      <div class="row mt-3">
-                          <div class="col-md-12"><label class="labels">Место работы (текущее)</label><input type="text" class="form-control" placeholder="'.$organization_name.'" value="" readonly></div>
-                          <div class="col-md-12"><label class="labels">Должность</label><input type="text" class="form-control" value="" placeholder="'.$position_name.'" readonly></div>
-                      </div>
-                      ';
-                    }
+                    echo '
+                    <div class="row mt-3">
+                        <div class="col-md-12"><label class="labels">Место работы (текущее)</label><input type="text" class="form-control" placeholder="'.$organization_name.'" value="" readonly></div>
+                        <div class="col-md-12"><label class="labels">Должность</label><input type="text" class="form-control" value="" placeholder="'.$position_name.'" readonly></div>
+                    </div>
+                    ';
                   }
-                    else {
-                      echo
-                      '
-                      <div class="row mt-3">
-                        <div class="col-md-12">Неизвестно</div>
-                      </div>
-                      ';
-                    }
-                  }
+                } else {
+                  echo
+                  '
+                  <div class="row mt-3">
+                    <div class="col-md-12">Неизвестно</div>
+                  </div>
+                  ';
+                }
+              }
 
-                ?>
-
+            ?>
           </div>
+
           <div class="p-3 py-4">
             <div class="d-flex justify-content-between align-items-center mb-3">
               <h4 class="text-right">Статус</h4>
             </div>
-                <?php
-                if($query = $db->prepare("SELECT persons.PDL_FLAG, persons.State_Employee_FLAG, persons.Law_Enforcement_Officer_FLAG
-                    FROM persons
-                    WHERE persons.IIN = $iin
-                    LIMIT 1;")){
-                    $query->execute();
-                    $result = $query->get_result();
-                    if($result->num_rows > 0) {
+            <?php
+              if($query = $db->prepare("SELECT persons.PDL_FLAG, persons.State_Employee_FLAG, persons.Law_Enforcement_Officer_FLAG
+                FROM persons
+                WHERE persons.IIN = $iin
+                LIMIT 1;")) {
+                  $query->execute();
+                  $result = $query->get_result();
+                  if($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $PDL_FLAG = $row["PDL_FLAG"];
-                        $State_Employee_FLAG = $row["State_Employee_FLAG"];
-                        $Law_Enforcement_Officer_FLAG = $row["Law_Enforcement_Officer_FLAG"];
+                      $PDL_FLAG = $row["PDL_FLAG"];
+                      $State_Employee_FLAG = $row["State_Employee_FLAG"];
+                      $Law_Enforcement_Officer_FLAG = $row["Law_Enforcement_Officer_FLAG"];
 
-                        if ($PDL_FLAG == 1){
+                      if ($PDL_FLAG == 1){
                         echo '
                         <div class="row mt-3">
                             <div class="col-md-12"><label class="labels"></label><input type="text" class="form-control" placeholder="ПДЛ" value="" readonly></div>
                         </div>
                         ';};
-                        if ($State_Employee_FLAG == 1){
+                      if ($State_Employee_FLAG == 1){
                         echo '
                         <div class="row mt-3">
                             <div class="col-md-12"><label class="labels"></label><input type="text" class="form-control" placeholder="Государственный служащий" value="" readonly></div>
                         </div>
                         ';};
-                        if ($Law_Enforcement_Officer_FLAG == 1){
+                      if ($Law_Enforcement_Officer_FLAG == 1){
                         echo '
                         <div class="row mt-3">
                             <div class="col-md-12"><label class="labels"></label><input type="text" class="form-control" placeholder="Сотрудник правоохранительного органа" value="" readonly></div>
                         </div>
                         ';};
-                        if ($PDL_FLAG == 0 AND $State_Employee_FLAG == 0 AND $Law_Enforcement_Officer_FLAG == 0){
+                      if ($PDL_FLAG == 0 AND $State_Employee_FLAG == 0 AND $Law_Enforcement_Officer_FLAG == 0){
                         echo '
                         <div class="row mt-3">
                             <div class="col-md-12"><label class="labels"></label><input type="text" class="form-control" placeholder="Неизвестно" value="" readonly></div>
                         </div>
-                        ';};
-
+                        ';
                       };
-                    }
+                    };
                   }
-
-               ?>
+                }
+              ?>
           </div>
-
         </div>
       </div>
     </div>
 
     <hr>
+
     <div class="container rounded bg-white mt-5 mb-5">
       <div class="d-flex justify-content-between align-items-center mb-3">
         <h4 class="text-right">Семья</h4>
       </div>
       <div class="row mt-3">
         <?php
-                  if($query = $db->prepare("SELECT a.relative_iin, b.LastName, b.FirstName, relationship_type.Name, relationship_type.priority
-                  FROM relatives a
-                  INNER JOIN relationship_type ON a.relationship_id = relationship_type.id
-                  
-                  INNER JOIN persons b ON b.IIN = a.relative_iin
-                  WHERE person_iin = $iin ORDER BY relationship_type.priority")) {
+          if($query = $db->prepare("SELECT a.relative_iin, b.LastName, b.FirstName, relationship_type.Name, relationship_type.priority
+          FROM relatives a
+          INNER JOIN relationship_type ON a.relationship_id = relationship_type.id
+          
+          INNER JOIN persons b ON b.IIN = a.relative_iin
+          WHERE person_iin = $iin ORDER BY relationship_type.priority")) {
 
-                  $query->execute();
-                  $result = $query->get_result();
-                  if($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                          if (! empty($row)) {
-                                $user_id = $row['relative_iin'];
-                                $full_name = $row['FirstName']." ".$row['LastName'];
-                                $relationship_type = $row['Name'];
-
-                                if($user_id!=0){
-                                  // Надо поменять ссылки
-                                  echo '
-
-
-                                    <div class="col-md-6">
-                                      <label class="labels"><b>'.$relationship_type.'</b></label>
-                                      <p>
-                                        <a href=person-single.php?id='.$user_id.'>
-                                          '.$full_name.'
-                                        </a>
-                                      </p>
-                                    </div>
-                                  ';
-                                }
-                                else {
-                                  echo '
-
-
-                                    <div class="col-md-6">
-                                      <label class="labels"><b>'.$relationship_type.'</b></label>
-                                        <p>
-                                        '.$full_name.'
-                                        </p>
-                                    </div>
-                                  ';
-                                }
-
-
-                              }
-                            }
-                          }
-                          else {
-                            echo '
-                            <div class="col-md-3">
-                              Неизвестно
-                            </div>';
-                          }
-
-                    }
-
-                ?>
-
+          $query->execute();
+          $result = $query->get_result();
+          if($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+              if (! empty($row)) {
+                $user_id = $row['relative_iin'];
+                $full_name = $row['FirstName']." ".$row['LastName'];
+                $relationship_type = $row['Name'];
+                if($user_id!=0){
+                  // Надо поменять ссылки
+                  echo '
+                    <div class="col-md-6">
+                      <label class="labels"><b>'.$relationship_type.'</b></label>
+                      <p>
+                        <a href=person-single.php?id='.$user_id.'>
+                          '.$full_name.'
+                        </a>
+                      </p>
+                    </div>
+                  ';
+                } else {
+                  echo '
+                  <div class="col-md-6">
+                    <label class="labels"><b>'.$relationship_type.'</b></label>
+                      <p>
+                      '.$full_name.'
+                      </p>
+                  </div>';
+                }
+              }
+            }
+            } else {
+              echo '
+              <div class="col-md-3">
+                Неизвестно
+              </div>';
+            }
+          }
+        ?>
       </div>
     </div>
 
-    <div class="container rounded bg-white mt-5 mb-5">
-      <button class="btn btn-primary" name="searchFurther" id="searchFurther">Найти родственников</button>
-      <div id="network"></div>
-      <?php
-          $nodes[] = [
-            'id' => $iin,
-            'name' => $FirstName . ' ' . $LastName,
-            'image' => (($Photo=='images/avatars/persons/')?'images/avatars/persons/default_icon.png':$Photo),
-            'href' => 'person-single.php?iin=' . $iin,
-            'label' => '<b>' . $FirstName . ' ' . $LastName . '</b>',
-            'font' => [
-              'multi' =>  "html",
-              'size' =>  20
-            ]
-          ];
-          $edges = [];
+    <hr>
+    
+    <div class="container">
+      <h1 class="mt-5 mb-3 text-center">Графическое отображение <br> родственных связей</h1>
+      <div class="container">
+        <ul class="nav nav-tabs justify-content-center mb-3 text-light p-3 rounded">
+          <li class="nav-item">
+            <a class="nav-link active" data-toggle="tab" href="#nav-graph-network"  color: #000000;">Графовая сеть</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#nav-hierarchical-tree" color: #000000;">Иерархическое древо</a>
+          </li>
+        </ul>
+      </div>
 
+      <!-- Сеть связей -->
+      <div class="tab-content container">
+        <div class="tab-pane fade active show align-items-center" id="nav-graph-network">
+          <button class="btn btn-primary" name="searchFurther" id="searchFurther">Найти родственников</button>
+          <div id="graph-network-vis"></div>
+          <?php
+            $nodes['graph-network'][] = [
+              'id' => $iin,
+              'name' => $FirstName . ' ' . $LastName,
+              'image' => (($Photo=='images/avatars/persons/')?'images/avatars/persons/default_icon.png':$Photo),
+              'href' => 'person-single.php?iin=' . $iin,
+              'label' => '<b>' . $FirstName . ' ' . $LastName . '</b>',
+              'font' => [
+                'multi' =>  "html",
+                'size' =>  20
+              ]
+            ];
+            $edges['graph-network'] = [];
+            
+            $displayed_ids = array($iin);
+            //$displayed_ids_string = implode(',', $displayed_ids);
+            require(HOME_DIR.'/src/person-single/graph-network.php');
+            $network_data = add_relatives_nodes($iin, $displayed_ids, $nodes['graph-network'], $edges['graph-network']);
 
-          $displayed_ids = array($iin);
-          //$displayed_ids_string = implode(',', $displayed_ids);
+            // echo json_encode($network_data[0]['graph-network'], JSON_UNESCAPED_UNICODE);
 
+            $nodes = $network_data[0];
+            $edges = $network_data[1];
+            $displayed_ids = $network_data[2];
+          ?>
 
-          function add_relatives_nodes($node_id, $displayed_ids, $nodes, $edges){
+          <script>
+            var nodes = <?php echo json_encode($nodes, JSON_UNESCAPED_UNICODE) ?>;
+            var edges = <?php echo json_encode($edges, JSON_UNESCAPED_UNICODE) ?>;
+            var displayed_ids = <?php echo json_encode($displayed_ids, JSON_UNESCAPED_UNICODE) ?>;
 
-            global $query, $db;
-            $displayed_ids_string = implode(',', $displayed_ids);
+            drawGraph(nodes, edges, displayed_ids);
+          </script>
+        </div>
+        
+        <!-- Древо связей -->
+        <div class="tab-pane fade align-items-center" id="nav-hierarchical-tree">
+          <div id="hierarchical-tree-vis"></div>
 
-            //query after UNION is added in case backward relative connection wasn't added to DB
-            if($query = $db->prepare("SELECT relative_iin, relative_name, relative_photo, relationship_type FROM (SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name,
-            b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives
-            INNER JOIN persons b ON relatives.relative_iin = b.IIN
-            INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-            WHERE relatives.person_iin =$node_id
-            UNION
-            SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name  as relationship_type FROM relatives
-            INNER JOIN persons b ON relatives.person_iin = b.IIN
-            INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-            WHERE relatives.relative_iin = $node_id) as person_relatives WHERE relative_iin not in ($displayed_ids_string) GROUP BY person_relatives.relative_iin;")){
+          <?php
+            $nodes['hierarchical-tree'][] = [
+              'id' => $iin,
+              'name' => $FirstName . ' ' . $LastName,
+              'image' => (($Photo=='images/avatars/persons/')?'images/avatars/persons/default_icon.png':$Photo),
+              'href' => 'person-single.php?iin=' . $iin,
+              'label' => '<b>' . $FirstName . ' ' . $LastName . '</b>',
+              'font' => [
+                'multi' =>  "html",
+                'size' =>  20
+              ]
+            ];
+            $edges['hierarchical-tree'] = [];
+            // $father_iin = '0000001';
+
+            // $displayed_idsd['hierarchical-tree'] = array($iin);
+            if($query = $db->prepare("SELECT relative_iin, relative_name, relative_photo, relationship_type 
+            FROM (SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name,
+              b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives
+              INNER JOIN persons b ON relatives.relative_iin = b.IIN
+              INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
+              WHERE relatives.person_iin =$iin
+              UNION
+              SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name  as relationship_type FROM relatives
+              INNER JOIN persons b ON relatives.person_iin = b.IIN
+              INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
+              WHERE relatives.relative_iin = $iin) as person_relatives 
+            WHERE relative_iin not in ($iin) 
+            GROUP BY person_relatives.relative_iin;")) {
               $query->execute();
               $result = $query->get_result();
               if($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                   if (! empty($row)) {
-
-                    if (in_array($row['relative_iin'], $displayed_ids)){
+                    if (in_array($row['relative_iin'], array($iin))){
                       continue;
                     }
-                    array_push($displayed_ids, $row['relative_iin']);
-
-                    $nodes[] = [
+                    $nodes['hierarchical-tree'][] = [
                       'id' => $row['relative_iin'],
                       'name' => $row['relative_name'],
                       'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
                       'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $row['relative_iin'] )),
                       'label' => $row['relative_name'] ."\n". $row['relative_iin']
                     ];
+                      
+                    // Определение массива связей между узлами в зависимости от типа отношения
+                    switch ($row['relationship_type']){
+                      case 'Отец':
+                        $edges['hierarchical-tree'][] = [
+                          'from' => $row['relative_iin'],
+                          'to' => $iin,
+                          'relationship_type' => $row['relationship_type'],
+                          'label' => 'Сын'
+                        ];
+                        $father_iin = $row['relative_iin'];
+                        break;
+                      case 'Жена':
+                        $edges['hierarchical-tree'][] = [
+                          'from' => $row['relative_iin'],
+                          'to' => $iin,
+                          'relationship_type' => $row['relationship_type'],
+                          'label' => 'Сын'
+                        ];
+                        
+                        $father_iin = $row['relative_iin'];
+                        break;
+                      case 'Брат':
+                        $edges['hierarchical-tree'][] = [
+                          'from' => $father_iin,
+                          'to' => $row['relative_iin'],
+                          'relationship_type' => $row['relationship_type'],
+                          'label' => 'Сын'
+                        ];
+                        break;
+                      case 'Сестра':
+                        $edges['hierarchical-tree'][] = [
+                          'from' => $father_iin,
+                          'to' => $row['relative_iin'],
+                          'relationship_type' => $row['relationship_type'],
+                          'label' => 'Дочь'
+                        ];
+                        break;
+                      case 'Сын':
+                        $edges['hierarchical-tree'][] = [
+                          'from' => $iin,
+                          'to' => $row['relative_iin'],
+                          'relationship_type' => $row['relationship_type'],
+                          'label' => $row['relationship_type']
+                        ];
+                        break;
+                      case 'Дочь':
+                        $edges['hierarchical-tree'][] = [
+                          'from' => $iin,
+                          'to' => $row['relative_iin'],
+                          'relationship_type' => $row['relationship_type'],
+                          'label' => $row['relationship_type']
+                        ];
+                        break;
 
-                    $edges[] = [
-                      'from' => $node_id,
-                      'to' => $row['relative_iin'],
-                      'relationship_type' => $row['relationship_type'],
-                      'label' => $row['relationship_type']
-                    ];
+                    }
                   }
                 }
-                $displayed_ids_string = implode(',', $displayed_ids); //update list of displayed arrays
               }
             }
+              
 
-            return array($nodes, $edges, $displayed_ids);
-          }
+            
+            // Преобразование массивов в формат JSON для передачи в JavaScript
+            $nodes_json = json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE);
+            $edges_json = json_encode($edges['hierarchical-tree'], JSON_UNESCAPED_UNICODE);
 
-          $network_data = add_relatives_nodes($iin, $displayed_ids, $nodes, $edges);
+            // echo json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE);
+          ?>
 
-          $nodes = $network_data[0];
-          $edges = $network_data[1];
-          $displayed_ids = $network_data[2];
+        <script>
+            var container = document.getElementById('hierarchical-tree-vis');
 
-        ?>
+            var nodes = <?php echo json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
+            var edges = <?php echo json_encode($edges['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
 
-      <script>
-        var container = document.getElementById('network');
-
-        var nodes = <?php echo json_encode($nodes, JSON_UNESCAPED_UNICODE) ?>;
-        var edges = <?php echo json_encode($edges, JSON_UNESCAPED_UNICODE) ?>;
-        var displayed_ids = <?php echo json_encode($displayed_ids, JSON_UNESCAPED_UNICODE) ?>;
-
-
-        var options = {
-          layout: {
-            hierarchical: false
-          },
-
-          physics: { // Настройки физики
-            forceAtlas2Based: { // Используется алгоритм ForceAtlas2 для расчета физики
-              gravitationalConstant: -
-              200, // Коэффициент гравитации. Отрицательное значение делает узлы отталкивающими друг друга
-              centralGravity: 0.005, // Коэффициент центральной гравитации. Определяет насколько сильно центральный узел будет притягивать другие узлы
-              springLength: 100, // Длина пружины. Определяет, насколько далеко узлы могут быть друг от друга
-              springConstant: 0.02, // Коэффициент жесткости пружины. Определяет, насколько быстро узлы будут двигаться к своей нормальной длине пружины
-              damping: 0.4, // Коэффициент затухания. Определяет, насколько быстро узлы будут останавливаться
-              avoidOverlap: 0 // Коэффициент избегания перекрытия узлов. Устанавливается в 1 для предотвращения перекрытий
-            },
-            maxVelocity: 50, // Максимальная скорость узлов
-            minVelocity: 0.1, // Минимальная скорость узлов
-            solver: "forceAtlas2Based", // Используется алгоритм ForceAtlas2 для решения физических конфликтов
-            timestep: 0.5, // Интервал времени между расчетами физики
-            stabilization: {
-              iterations: 2000
-            } // Количество итераций стабилизации после рисования графа. Нужно для предотвращения дрожания узлов
-          },
-
-          nodes: {
-            shape: "circularImage",
-            size: 70, // Размер узлов
-            distance: 1250,
-            shapeProperties: {
-              useImageSize: true
-            },
-            borderWidth: 2,
-            borderWidthSelected: 4,
-            font: {
-              color: '#343434',
-              size: 16,
-              face: 'arial',
-              background: 'none',
-              strokeWidth: 0,
-              strokeColor: '#ffffff'
-            },
-            color: {
-              border: '#2B7CE9',
-              background: '#97C2FC',
-              highlight: {
-                border: '#2B7CE9',
-                background: '#D2E5FF'
+            var options = {
+              layout: {
+                hierarchical: {
+                  direction: "UD",
+                  sortMethod: "directed",
+                  levelSeparation: 200,
+                  nodeSpacing: 400
+                }
               },
-              hover: {
-                border: '#2B7CE9',
-                background: '#D2E5FF'
-              }
-            }
-          },
-
-          edges: {
-            arrows: {
-              to: {
-                enabled: true,
-                scaleFactor: 1,
-                type: "arrow"
-              }
-            },
-            font: {
-              color: '#0f5587',
-              size: 16, // px
-              face: 'arial',
-              background: 'none',
-              strokeWidth: 2, // px
-              strokeColor: '#ffffff',
-              align: 'horizontal',
-              multi: false,
-              vadjust: 0,
-
-            },
-            size: 40,
-            length: 400,
-
-            smooth: {
-              type: 'continuous'
-            },
-            width: 2,
-            color: {
-              color: '#757575',
-              highlight: '#757575',
-              hover: '#757575'
-            }
-          },
-          interaction: {
-            hover: true,
-            navigationButtons: true,
-            keyboard: true,
-            zoomView: false // запрещаем масштабирование с помощью мыши
-          },
-          // manipulation: {
-          // enabled: true // добавляет функцию редактирования графика по идее не нужно?
-          // }
-        };
-
-        var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
-        var chosen_node = undefined;
-
-        // network.on("click", function (obj) {
-        //   chosen_node = this.getNodeAt(obj.pointer.DOM);
-        // });
-
-        network.on("click", function (obj) {
-          chosen_node = this.getNodeAt(obj.pointer.DOM);
-        });
-
-
-        network.on("doubleClick", function (obj) {
-          if (this.getNodeAt(obj.pointer.DOM) != undefined) {
-            var node = network.getNodeAt(obj.pointer.DOM);
-            for (i in nodes) {
-              if (nodes[i]["id"] == node) {
-                var href = nodes[i]["href"];
-                break;
-              }
-            }
-            window.location.href = (href);
-          }
-        });
-
-        $("#searchFurther").click(function (obj) {
-          if (chosen_node != undefined) {
-
-            $.ajax({
-              type: "POST",
-              url: "load_nodes.php", // Send the AJAX request to the same page
-              dataType: 'json',
-              cache: false,
-              data: {
-                node_id: chosen_node,
-                displayed_ids: displayed_ids,
-                nodes: nodes,
-                edges: edges
+              edges: {
+                smooth: {
+                  type: 'cubicBezier',
+                  forceDirection: 'horizontal',
+                  roundness: 0.4
+                }
               },
-              success: function(response) {
-                // The AJAX request was successful, do something here if needed
-
-                nodes = response.nodes;
-                edges = response.edges;
-                displayed_ids = response.displayed_ids;
-                // alert(displayed_ids.length);
-                network.setData({ nodes: nodes, edges: edges });
-
-                // nodes.forEach(function(entry) {
-                //   console.log(entry);
-                // });
-
-                // edges.forEach(function(entry) {
-                //   console.log(entry);
-                // });
-
+              nodes: {
+                shape: 'circularImage',
+                size: 50,
+                borderWidth: 2,
+                color: {
+                  border: '#2B7CE9',
+                  background: '#97C2FC',
+                  highlight: {
+                    border: '#2B7CE9',
+                    background: '#D2E5FF'
+                  },
+                  hover: {
+                    border: '#2B7CE9',
+                    background: '#D2E5FF'
+                  }
+                }
               },
-              error: function() {
-                // The AJAX request failed, do something here if needed
-                alert("AJAX request failed");
-              }
-            });
+  
+            interaction: {
+              hover: true,
+              navigationButtons: true,
+              keyboard: true,
+              zoomView: false // запрещаем масштабирование с помощью мыши
+            },
+          };
 
+            var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
 
-            // var newNode = {
-            //   id: nodes.length + 1, // Generate a new ID for the node
-            //   name: "neww",
-            //   image: "",
-            //   href: '',
-            //   label: "1212"
-            // };
+        </script>
 
-            // var newEdge = {
-            //   from: node_id,
-            //   to: nodes.length + 1,
-            //   relationship_type: ""
-            // };
+        </div>
+      </div>
 
-            // nodes.push(newNode); // Add the new node to the nodes array
-            // edges.push(newEdge);
-            //network.setData({ nodes: nodes, edges: edges }); // Update the network data
-
-            //alert(chosen_node);
-
-          }
-        });
-      </script>
     </div>
+
     <hr>
 
     <div class="container rounded bg-white mt-5 mb-5">
@@ -528,9 +480,11 @@ else {
       </div>
 
       <?php
-      if($query = $db->prepare("SELECT time_start_position, time_end_position,  position_name, organization_ID, organization_list.Name as organization_name FROM `job_history` INNER JOIN persons on persons.IIN=job_history.person_iin
-                                INNER JOIN organization_list on organization_ID=organization_list.id
-                                WHERE person_iin = $iin ORDER BY time_start_position DESC")) {
+        if($query = $db->prepare("SELECT time_start_position, time_end_position,  position_name, organization_ID, organization_list.Name as organization_name 
+        FROM `job_history` 
+        INNER JOIN persons on persons.IIN=job_history.person_iin
+        INNER JOIN organization_list on organization_ID=organization_list.id
+        WHERE person_iin = $iin ORDER BY time_start_position DESC")) {
 
         $query->execute();
         $result = $query->get_result();
@@ -573,5 +527,4 @@ else {
           require_once(HOME_DIR.'/include/navmenu.php');
     ?>
 </body>
-
 </html>

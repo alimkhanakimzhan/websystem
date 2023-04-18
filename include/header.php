@@ -16,6 +16,10 @@ echo '
   <script src="js/vis-timeline-graph2d.min.js"></script>
   <script src="js/leaflet.js"></script>
 
+
+
+  <script src="src/person-single/graph-network.js"></script>
+
 </head>
 '
 ?>
