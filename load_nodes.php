@@ -16,10 +16,8 @@
         $nodes = $_POST['nodes'];
         $edges = $_POST['edges'];
         function add_relatives_nodes($node_id, $displayed_ids, $nodes, $edges){
-
             global $query, $db;
             $displayed_ids_string = implode(',', $displayed_ids);
-            $is_on = [$node_id => "NO"]; // есть ли человек на графике
 
             //query after UNION is added in case backward relative connection wasn't added to DB
             if($query = $db->prepare("SELECT relative_iin, relative_name, relative_photo, relationship_type FROM (SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name,
@@ -36,37 +34,43 @@
               $result = $query->get_result();
               if($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
+                  $relative_iin = $row['relative_iin'];
+                  $relative_name = $row['relative_name'];
+                  $relative_photo = $row['relative_photo'];
+                  $relationship_type = $row['relationship_type'];
+
                   if (! empty($row)) {
 
-                    if (in_array($row['relative_iin'], $displayed_ids)){
-                        $is_on[] = [$row['relative_iin'] => "YES"];
-                        $edges[] = [
-                          'from' => $node_id,
-                          'to' => $row['relative_iin'],
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => $row['relationship_type']
-                        ];
-                        continue;
+                    if (in_array($relative_iin, $displayed_ids)){
+
+                        if (isset($edges[$relative_iin.'-'.$node_id]) || isset($edges[$node_id.'-'.$relative_iin])){
+                          continue;
+                        }else{
+                          $edges[$node_id.'-'.$relative_iin] = [
+                            'from' => $node_id,
+                            'to' => $relative_iin,
+                            'relationship_type' => $relationship_type,
+                            'label' => $relationship_type
+                            ];
+                            continue;
+                        }
+          
                     }
+                    array_push($displayed_ids, $relative_iin);
 
-                    $is_on[] = [$row['relative_iin'] => "NO"];
-                    array_push($displayed_ids, $row['relative_iin']);
-
-
-
-                    $nodes[] = [
-                      'id' => $row['relative_iin'],
-                      'name' => $row['relative_name'],
-                      'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
-                      'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $row['relative_iin'] )),
-                      'label' => $row['relative_name']
+                    $nodes[$relative_iin] = [
+                      'id' => $relative_iin,
+                      'name' => $relative_name,
+                      'image' => 'images/avatars/persons/' . (($relative_photo=='')?'default_icon.png':$relative_photo),
+                      'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $relative_iin )),
+                      'label' => $relative_name
                     ];
 
-                    $edges[] = [
+                    $edges[$node_id.'-'.$relative_iin] = [
                       'from' => $node_id,
-                      'to' => $row['relative_iin'],
-                      'relationship_type' => $row['relationship_type'],
-                      'label' => $row['relationship_type']
+                      'to' => $relative_iin,
+                      'relationship_type' => $relationship_type,
+                      'label' => $relationship_type
                     ];
                   }
                 }
@@ -76,7 +80,7 @@
             return array("displayed_ids" => $displayed_ids,
                         "nodes" => $nodes,
                         "edges" => $edges,
-                        "is_on" => $is_on);
+                        "echo" => 'empty'); // for debug purposes
           }
 
 

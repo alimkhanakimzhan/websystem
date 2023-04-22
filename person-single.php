@@ -263,7 +263,7 @@ else {
           <button class="btn btn-primary" name="searchFurther" id="searchFurther">Найти родственников</button>
           <div id="graph-network-vis"></div>
           <?php
-            $nodes['graph-network'][] = [
+            $nodes['graph-network'][$iin] = [
               'id' => $iin,
               'name' => $FirstName . ' ' . $LastName,
               'image' => (($Photo=='images/avatars/persons/')?'images/avatars/persons/default_icon.png':$Photo),

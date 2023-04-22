@@ -103,7 +103,10 @@ function drawGraph(nodes, edges, displayed_ids) {
         // }
       };
       
-    var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
+    var loaded_nodes = Object.values(Object.assign({}, nodes));  // make a copy of nodes and edges without keys that we are going to load into the network (if we leave the keys, visjs won't understand the inserted data)
+    var loaded_edges = Object.values(Object.assign({}, edges)); 
+
+    var network = new vis.Network(container, { nodes: loaded_nodes, edges: loaded_edges }, options);
     var chosen_node = undefined;
     
     
@@ -128,7 +131,6 @@ function drawGraph(nodes, edges, displayed_ids) {
     
     $("#searchFurther").click(function (obj) {
     if (chosen_node != undefined) {
-    
         $.ajax({
         type: "POST",
         url: "load_nodes.php", // Send the AJAX request to the same page
@@ -142,12 +144,15 @@ function drawGraph(nodes, edges, displayed_ids) {
         },
         success: function(response) {
             // The AJAX request was successful, do something here if needed
-    
+            // console.log(response.echo); // for debug purposes
             nodes = response.nodes;
             edges = response.edges;
             displayed_ids = response.displayed_ids;
             // alert(displayed_ids.length);
-            network.setData({ nodes: nodes, edges: edges });
+
+            loaded_nodes = Object.values(Object.assign({}, nodes));  // make a copy of nodes and edges without keys that we are going to load into the network (if we leave the keys, visjs won't understand the inserted data)
+            loaded_edges = Object.values(Object.assign({}, edges));
+            network.setData({ nodes: loaded_nodes, edges: loaded_edges });
     
             // nodes.forEach(function(entry) {
             //   console.log(entry);

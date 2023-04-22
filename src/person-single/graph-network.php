@@ -31,25 +31,30 @@ function add_relatives_nodes($node_id, $displayed_ids, $nodes, $edges){
       $result = $query->get_result();
       if($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
+          $relative_iin = $row['relative_iin'];
+          $relative_name = $row['relative_name'];
+          $relative_photo = $row['relative_photo'];
+          $relationship_type = $row['relationship_type'];
+
           if (! empty($row)) {
-            if (in_array($row['relative_iin'], $displayed_ids)){
+            if (in_array($relative_iin, $displayed_ids)){
               continue;
             }
-            array_push($displayed_ids, $row['relative_iin']);
+            array_push($displayed_ids, $relative_iin);
 
-            $nodes[] = [
-              'id' => $row['relative_iin'],
-              'name' => $row['relative_name'],
-              'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
-              'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $row['relative_iin'] )),
-              'label' => $row['relative_name'] ."\n". $row['relative_iin']
+            $nodes[$relative_iin] = [
+              'id' => $relative_iin,
+              'name' => $relative_name,
+              'image' => 'images/avatars/persons/' . (($relative_photo=='')?'default_icon.png':$relative_photo),
+              'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $relative_iin )),
+              'label' => $relative_name ."\n". $relative_iin
             ];
 
-            $edges[] = [
+            $edges[$node_id.'-'.$relative_iin] = [
               'from' => $node_id,
-              'to' => $row['relative_iin'],
-              'relationship_type' => $row['relationship_type'],
-              'label' => $row['relationship_type']
+              'to' => $relative_iin,
+              'relationship_type' => $relationship_type,
+              'label' => $relationship_type
             ];
           }
         }
