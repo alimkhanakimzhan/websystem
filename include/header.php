@@ -15,6 +15,8 @@ echo '
   <script src="js/vis-network.min.js"></script>
   <script src="js/vis-timeline-graph2d.min.js"></script>
   <script src="js/leaflet.js"></script>
+  <script src="js/d3.v5.min.js"></script>
+
 
 
 
