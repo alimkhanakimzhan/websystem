@@ -244,6 +244,7 @@ else {
 
     <hr>
     
+    <!-- Отображение семейный связей -->
     <div class="container">
       <h1 class="mt-5 mb-3 text-center">Графическое отображение <br> родственных связей</h1>
       <div class="container">
@@ -300,7 +301,6 @@ else {
         <!-- Древо связей -->
         <div class="tab-pane fade align-items-center" id="nav-hierarchical-tree">
           <div id="hierarchical-tree-vis"></div>
-
           <?php
             $nodes['hierarchical-tree'][] = [
               'id' => $iin,
@@ -415,61 +415,68 @@ else {
             // echo json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE);
           ?>
 
-        <script>
-            var container = document.getElementById('hierarchical-tree-vis');
+          <script>
+              var container = document.getElementById('hierarchical-tree-vis');
 
-            var nodes = <?php echo json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
-            var edges = <?php echo json_encode($edges['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
+              var nodes = <?php echo json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
+              var edges = <?php echo json_encode($edges['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
 
-            var options = {
-              layout: {
-                hierarchical: {
-                  direction: "UD",
-                  sortMethod: "directed",
-                  levelSeparation: 200,
-                  nodeSpacing: 400
-                }
-              },
-              edges: {
-                smooth: {
-                  type: 'cubicBezier',
-                  forceDirection: 'horizontal',
-                  roundness: 0.4
-                }
-              },
-              nodes: {
-                shape: 'circularImage',
-                size: 50,
-                borderWidth: 2,
-                color: {
-                  border: '#2B7CE9',
-                  background: '#97C2FC',
-                  highlight: {
-                    border: '#2B7CE9',
-                    background: '#D2E5FF'
-                  },
-                  hover: {
-                    border: '#2B7CE9',
-                    background: '#D2E5FF'
+              var options = {
+                layout: {
+                  hierarchical: {
+                    direction: "UD",
+                    sortMethod: "directed",
+                    levelSeparation: 200,
+                    nodeSpacing: 400
                   }
-                }
+                },
+                edges: {
+                  smooth: {
+                    type: 'cubicBezier',
+                    forceDirection: 'horizontal',
+                    roundness: 0.4
+                  }
+                },
+                nodes: {
+                  shape: 'circularImage',
+                  size: 50,
+                  borderWidth: 2,
+                  color: {
+                    border: '#2B7CE9',
+                    background: '#97C2FC',
+                    highlight: {
+                      border: '#2B7CE9',
+                      background: '#D2E5FF'
+                    },
+                    hover: {
+                      border: '#2B7CE9',
+                      background: '#D2E5FF'
+                    }
+                  }
+                },
+    
+              interaction: {
+                hover: true,
+                navigationButtons: true,
+                keyboard: true,
+                zoomView: false // запрещаем масштабирование с помощью мыши
               },
-  
-            interaction: {
-              hover: true,
-              navigationButtons: true,
-              keyboard: true,
-              zoomView: false // запрещаем масштабирование с помощью мыши
-            },
-          };
+            };
 
-            var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
+              var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
 
-        </script>
+          </script>
 
         </div>
       </div>
-
+    </div>
+    
+    <hr>
+    
+    <!-- Древовидная карта -->
+    <div class="container rounded bg-white mt-5 mb-5">
+      <div id='treemap-container'></div>
+      <?php require(HOME_DIR.'/src/person-single/treemap.php')?>
     </div>
 
     <hr>
