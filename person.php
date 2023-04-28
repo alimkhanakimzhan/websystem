@@ -68,16 +68,16 @@ require_once "config.php";
           if($search_field_parameter =='' AND $firstName_request =='' AND  $lastName_request =='' AND $patronymic_request ==''){
             if($query = $db->prepare("SELECT IIN, LastName, FirstName, Patronymic, Photo, PDL_FLAG, State_Employee_FLAG, Law_Enforcement_Officer_FLAG, organization_list.name as organization_name
                -- gender.name, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as nationality
-            FROM persons 
+            FROM persons
             -- INNER JOIN gender ON gender.id = persons.GenderID
             -- INNER JOIN regions ON regions.id = persons.birth_region_id
             -- INNER JOIN nationalities ON nationalities.id = persons.nationality_id
             INNER JOIN job_history ON persons.IIN = job_history.person_iin
             INNER JOIN organization_list on organization_ID=organization_list.id
-            WHERE job_history.time_end_position = '0000-00-00 00:00' 
+            WHERE job_history.time_end_position = '0000-00-00 00:00'
 
-            ORDER BY persons.Photo DESC LIMIT 50; ")) { 
-              // есть ошибка связанная с работай и отображением то есть может существовать человек 
+            ORDER BY persons.Photo DESC LIMIT 50; ")) {
+              // есть ошибка связанная с работай и отображением то есть может существовать человек
               //с несколькими должностями и кроме того в базе может присутсвовать персоны чья работа не определена точно
               // прим Алия Назарбаевна у нее несколько должностей которые без указания когда ее сняли с работы
               $query->execute();
@@ -144,18 +144,18 @@ require_once "config.php";
           INNER JOIN job_history ON persons.IIN = job_history.person_iin
           INNER JOIN organization_list on organization_ID=organization_list.id
           -- INNER JOIN nationalities ON nationalities.id = persons.nationality_id
-          WHERE 
+          WHERE
           -- job_history.time_end_position = '0000-00-00 00:00' 
           -- AND
            ";
 
           //  Запрос показывает последнию работу персоны если есть работы не известные
           // $query = "SELECT
-          //  persons.IIN, 
-          //     persons.FirstName, 
-          //     persons.LastName, 
-          //     persons.Patronymic, 
-          //     persons.Photo, 
+          //  persons.IIN,
+          //     persons.FirstName,
+          //     persons.LastName,
+          //     persons.Patronymic,
+          //     persons.Photo,
           //     organization_list.name as organization_name
           //   FROM persons
           //   INNER JOIN (
@@ -166,7 +166,7 @@ require_once "config.php";
           //   INNER JOIN job_history ON persons.IIN = job_history.person_iin AND job_history.time_end_position = last_job.last_time_end
           //   INNER JOIN organization_list ON job_history.organization_ID = organization_list.id
           //   Where
-            
+
           //  ";
 
 
@@ -264,40 +264,3 @@ require_once "config.php";
     ?>
 </body>
 </html>
-
-
-
-
-<!-- @ARTICLE{somebody_2001,
-  language =     "english",
-  AUTHOR =       "Androulaki, E., Karame, G. O., Roeschlin, M., Scherer, T., & Capkun, S",
-  TITLE =        "Evaluating user privacy in bitcoin. In International Conference on Financial Cryptography and Data Security",
-  JOURNAL =      "Springer, Berlin, Heidelberg oblast",
-  YEAR =         "2013",
-  volume =       "",
-  number =       "",
-  pages =        "34--51"
-} -->
-
-
-% % Financial Action Task Force (FATF). (2020). Virtual assets and virtual asset service providers. Retrieved from https://www.fatf-gafi.org/media/fatf/documents/recommendations/RBA-VA-VASPs.pdf
-
-% % Kosba, A., Miller, A., Shi, E., Wen, Z., & Papamanthou, C. (2016, February). Hawk: The blockchain model of cryptography and privacy-preserving smart contracts. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security (pp. 839-851).
-
-% % Kumar, D., Shah, D., & Naik, R. (2019). On the anonymity of Wasabi Wallet. In Financial Cryptography and Data Security (pp. 341-356). Springer, Cham.
-% Meiklejohn, S., Pomarole, M., Jordan, G., Levchenko, K., McCoy, D., Voelker, G. M., & Savage, S. (2013, October). A fistful of bitcoins: characterizing payments among men with no names. In Proceedings of the 2013 conference on Internet measurement conference (pp. 127-140). ACM.
-
-
-
-<!-- @CONFERENCE{my_soname_2021,
-  author =       {Smith, A. and Johnson, K.},
-  title =        {Abstract paper name},
-  booktitle =    {2021 IEEE International Conference},
-  year =         {2021},
-  volume =       {1},
-  pages  =       {1--5},
-  address =      {Astana},
-  month =        {4},
-  organization = {IEEE},
-  url =          {https://doi.org/10.1109/XXXXXXX.2021.0000001}
-} -->
