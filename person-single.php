@@ -475,6 +475,7 @@ else {
     
     <!-- Древовидная карта -->
     <div class="container rounded bg-white mt-5 mb-5">
+      <h2 class="mt-5 mb-3 text-center">Операции</h4>
       <div id='treemap-container'></div>
       <?php require(HOME_DIR.'/src/person-single/treemap.php')?>
     </div>

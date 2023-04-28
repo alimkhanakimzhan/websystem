@@ -145,8 +145,8 @@ require_once "config.php";
           INNER JOIN organization_list on organization_ID=organization_list.id
           -- INNER JOIN nationalities ON nationalities.id = persons.nationality_id
           WHERE 
-          job_history.time_end_position = '0000-00-00 00:00' 
-          AND
+          -- job_history.time_end_position = '0000-00-00 00:00' 
+          -- AND
            ";
 
           //  Запрос показывает последнию работу персоны если есть работы не известные
@@ -264,3 +264,40 @@ require_once "config.php";
     ?>
 </body>
 </html>
+
+
+
+
+<!-- @ARTICLE{somebody_2001,
+  language =     "english",
+  AUTHOR =       "Androulaki, E., Karame, G. O., Roeschlin, M., Scherer, T., & Capkun, S",
+  TITLE =        "Evaluating user privacy in bitcoin. In International Conference on Financial Cryptography and Data Security",
+  JOURNAL =      "Springer, Berlin, Heidelberg oblast",
+  YEAR =         "2013",
+  volume =       "",
+  number =       "",
+  pages =        "34--51"
+} -->
+
+
+% % Financial Action Task Force (FATF). (2020). Virtual assets and virtual asset service providers. Retrieved from https://www.fatf-gafi.org/media/fatf/documents/recommendations/RBA-VA-VASPs.pdf
+
+% % Kosba, A., Miller, A., Shi, E., Wen, Z., & Papamanthou, C. (2016, February). Hawk: The blockchain model of cryptography and privacy-preserving smart contracts. In Proceedings of the 2016 ACM SIGSAC Conference on Computer and Communications Security (pp. 839-851).
+
+% % Kumar, D., Shah, D., & Naik, R. (2019). On the anonymity of Wasabi Wallet. In Financial Cryptography and Data Security (pp. 341-356). Springer, Cham.
+% Meiklejohn, S., Pomarole, M., Jordan, G., Levchenko, K., McCoy, D., Voelker, G. M., & Savage, S. (2013, October). A fistful of bitcoins: characterizing payments among men with no names. In Proceedings of the 2013 conference on Internet measurement conference (pp. 127-140). ACM.
+
+
+
+<!-- @CONFERENCE{my_soname_2021,
+  author =       {Smith, A. and Johnson, K.},
+  title =        {Abstract paper name},
+  booktitle =    {2021 IEEE International Conference},
+  year =         {2021},
+  volume =       {1},
+  pages  =       {1--5},
+  address =      {Astana},
+  month =        {4},
+  organization = {IEEE},
+  url =          {https://doi.org/10.1109/XXXXXXX.2021.0000001}
+} -->

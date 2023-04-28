@@ -104,10 +104,10 @@ require_once "config.php";
 
 
 ?>
-<div class="container rounded bg-white mt-5 mb-5">
-  <div id='treemap-container'></div>
+<!-- <div class="container rounded bg-white mt-5 mb-5"> -->
+  <!-- <div id='treemap-container'></div> -->
 
-</div>
+<!-- </div> -->
 
 
 <script>
@@ -180,7 +180,7 @@ require_once "config.php";
             .attr("y", d => (d.y1 - d.y0) / 2)
             .attr("fill-opacity", d => (d.y1 - d.y0 >= 30 && d.x1 - d.x0 >= 70) ? 1 : 0)
             .text(d => `${((d.value / root.value) * 100).toFixed(2)}%`)
-            .style('font', '36px sans-serif');
+            .style('font', '24px sans-serif');
 
         // Legenda
         const legend = svg.append("g")
