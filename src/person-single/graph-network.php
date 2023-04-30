@@ -54,7 +54,8 @@ function add_relatives_nodes($node_id, $displayed_ids, $nodes, $edges){
               'from' => $node_id,
               'to' => $relative_iin,
               'relationship_type' => $relationship_type,
-              'label' => $relationship_type
+              'label' => $relationship_type,
+              'id' => $node_id.'-'.$relative_iin
             ];
           }
         }

@@ -18,6 +18,8 @@
         function add_relatives_nodes($node_id, $displayed_ids, $nodes, $edges){
             global $query, $db;
             $displayed_ids_string = implode(',', $displayed_ids);
+            $new_nodes = [];
+            $new_edges = [];
 
             //query after UNION is added in case backward relative connection wasn't added to DB
             if($query = $db->prepare("SELECT relative_iin, relative_name, relative_photo, relationship_type FROM (SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name,
@@ -50,8 +52,17 @@
                             'from' => $node_id,
                             'to' => $relative_iin,
                             'relationship_type' => $relationship_type,
-                            'label' => $relationship_type
+                            'label' => $relationship_type,
+                            'id' => $node_id.'-'.$relative_iin
                             ];
+
+                            $new_edges[$node_id.'-'.$relative_iin] = [
+                              'from' => $node_id,
+                              'to' => $relative_iin,
+                              'relationship_type' => $relationship_type,
+                              'label' => $relationship_type,
+                              'id' => $node_id.'-'.$relative_iin
+                              ];
                             continue;
                         }
           
@@ -65,12 +76,28 @@
                       'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $relative_iin )),
                       'label' => $relative_name
                     ];
+                    $new_nodes[$relative_iin] = [
+                      'id' => $relative_iin,
+                      'name' => $relative_name,
+                      'image' => 'images/avatars/persons/' . (($relative_photo=='')?'default_icon.png':$relative_photo),
+                      'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $relative_iin )),
+                      'label' => $relative_name
+                    ];
+
 
                     $edges[$node_id.'-'.$relative_iin] = [
                       'from' => $node_id,
                       'to' => $relative_iin,
                       'relationship_type' => $relationship_type,
-                      'label' => $relationship_type
+                      'label' => $relationship_type,
+                      'id' => $node_id.'-'.$relative_iin
+                    ];
+                    $new_edges[$node_id.'-'.$relative_iin] = [
+                      'from' => $node_id,
+                      'to' => $relative_iin,
+                      'relationship_type' => $relationship_type,
+                      'label' => $relationship_type,
+                      'id' => $node_id.'-'.$relative_iin
                     ];
                   }
                 }
@@ -78,8 +105,8 @@
             }
 
             return array("displayed_ids" => $displayed_ids,
-                        "nodes" => $nodes,
-                        "edges" => $edges,
+                        "nodes" => $new_nodes,
+                        "edges" => $new_edges,
                         "echo" => 'empty'); // for debug purposes
           }
 

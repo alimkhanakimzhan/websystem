@@ -71,11 +71,17 @@ else {
 
 
           if($search_field_parameter =='' AND $firstName_request =='' AND  $lastName_request =='' AND $patronymic_request ==''){
-            if($query = $db->prepare("SELECT persons.id, IIN, FirstName, LastName, Patronymic, Photo, gender.name, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as nationality
-            FROM persons INNER JOIN gender ON gender.id = persons.GenderID
-            INNER JOIN regions ON regions.id = persons.birth_region_id
-            INNER JOIN nationalities ON nationalities.id = persons.nationality_id
-            ORDER BY `persons`.`ID` ASC LIMIT 50; ")) {
+            if($query = $db->prepare("SELECT IIN, LastName, FirstName, Patronymic, Photo, PDL_FLAG, State_Employee_FLAG, Law_Enforcement_Officer_FLAG, organization_list.name as organization_name
+            -- gender.name, BirthDate, regions.name as PlaceOfBirth, nationalities.nationality as nationality
+         FROM persons 
+         -- INNER JOIN gender ON gender.id = persons.GenderID
+         -- INNER JOIN regions ON regions.id = persons.birth_region_id
+         -- INNER JOIN nationalities ON nationalities.id = persons.nationality_id
+         INNER JOIN job_history ON persons.IIN = job_history.person_iin
+         INNER JOIN organization_list on organization_ID=organization_list.id
+         WHERE job_history.time_end_position = '0000-00-00 00:00' 
+
+         ORDER BY persons.Photo DESC LIMIT 50; ")) {
 
               $query->execute();
               $result = $query->get_result();
@@ -96,39 +102,31 @@ else {
                   <tbody>
               ';
                 while ($row = $result->fetch_assoc()) {
-                    $id = $row["id"];
                     $iin = $row["IIN"];
                     $FirstName = $row["FirstName"];
                     $LastName = $row["LastName"];
                     $Patronymic = $row["Patronymic"];
-                    $BirthDate = $row["BirthDate"];
-                    $PlaceOfBirth = $row["PlaceOfBirth"];
-                    $Photo = '../images/avatars/persons/' . $row["Photo"];
-
+                    $Photo = '../images/avatars/persons/' . (($row["Photo"] == '') ? 'default_icon.png' : $row["Photo"]);
+                    $CurrentWorkPlace = $row["organization_name"];
                     echo '
-
                     <tr class="alert" role="alert">
                       <td class="d-flex align-items-center">
                         <div class="img" style="background-image: url('.$Photo.');"></div>
                       </td>
                       <td class="">
-                        <a href=edit-person.php?id='.$id.'> <span>'.$iin.'</span> </a>
-
-                      </td>
-                      <td class="">
-                        <span>'.$FirstName.'</span>
+                        <a href=person-single.php?iin='.$iin.'> <span>'.$iin.'</span> </a>
                       </td>
                       <td class="">
                         <span>'.$LastName.'</span>
                       </td>
                       <td class="">
+                        <span>'.$FirstName.'</span>
+                      </td>
+                      <td class="">
                         <span>'.$Patronymic.'</span>
                       </td>
                       <td class="">
-                        <span>'.$PlaceOfBirth.'</span>
-                      </td>
-                      <td class="">
-                        <a href=edit-person.php?id='.$id.'><span>Edit</span></a>
+                        <span>'.$CurrentWorkPlace.'</span>
                       </td>
                     </tr>';
                 }

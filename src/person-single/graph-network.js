@@ -103,8 +103,8 @@ function drawGraph(nodes, edges, displayed_ids) {
         // }
       };
       
-    var loaded_nodes = Object.values(Object.assign({}, nodes));  // make a copy of nodes and edges without keys that we are going to load into the network (if we leave the keys, visjs won't understand the inserted data)
-    var loaded_edges = Object.values(Object.assign({}, edges)); 
+    var loaded_nodes = new vis.DataSet(Object.values(Object.assign({}, nodes)));  // make a copy of nodes and edges without keys that we are going to load into the network (if we leave the keys, visjs won't understand the inserted data)
+    var loaded_edges = new vis.DataSet(Object.values(Object.assign({}, edges))); 
 
     var network = new vis.Network(container, { nodes: loaded_nodes, edges: loaded_edges }, options);
     var chosen_node = undefined;
@@ -145,51 +145,34 @@ function drawGraph(nodes, edges, displayed_ids) {
         success: function(response) {
             // The AJAX request was successful, do something here if needed
             // console.log(response.echo); // for debug purposes
-            nodes = response.nodes;
-            edges = response.edges;
+            nodes = Object.assign({}, nodes, response.nodes);
+            edges = Object.assign({}, edges, response.edges);
             displayed_ids = response.displayed_ids;
             // alert(displayed_ids.length);
+            console.log(edges);
+            console.log(response.edges);
+            // loaded_nodes.add(Object.values(Object.assign({}, nodes)));
+            // loaded_edges.add();
 
-            loaded_nodes = Object.values(Object.assign({}, nodes));  // make a copy of nodes and edges without keys that we are going to load into the network (if we leave the keys, visjs won't understand the inserted data)
-            loaded_edges = Object.values(Object.assign({}, edges));
-            network.setData({ nodes: loaded_nodes, edges: loaded_edges });
-    
-            // nodes.forEach(function(entry) {
-            //   console.log(entry);
-            // });
-    
-            // edges.forEach(function(entry) {
-            //   console.log(entry);
-            // });
-    
+            // loaded_nodes = Object.values(Object.assign({}, nodes));  // make a copy of nodes and edges without keys that we are going to load into the network (if we leave the keys, visjs won't understand the inserted data)
+            // loaded_edges = Object.values(Object.assign({}, edges));
+            // network.setData({ nodes: loaded_nodes, edges: loaded_edges });
+            // for (let i = 0; i < ids.length; i++){
+            //   treeData.nodes.update({id:ids[i],hidden:true})
+            // }   
+            
+
+            loaded_nodes.add(Object.values(response.nodes));
+
+            loaded_edges.add(Object.values(response.edges));
+
         },
         error: function() {
             // The AJAX request failed, do something here if needed
             alert("AJAX request failed");
         }
         });
-    
-    
-        // var newNode = {
-        //   id: nodes.length + 1, // Generate a new ID for the node
-        //   name: "neww",
-        //   image: "",
-        //   href: '',
-        //   label: "1212"
-        // };
-    
-        // var newEdge = {
-        //   from: node_id,
-        //   to: nodes.length + 1,
-        //   relationship_type: ""
-        // };
-    
-        // nodes.push(newNode); // Add the new node to the nodes array
-        // edges.push(newEdge);
-        //network.setData({ nodes: nodes, edges: edges }); // Update the network data
-    
-        //alert(chosen_node);
-    
+
     }
     });
 }
