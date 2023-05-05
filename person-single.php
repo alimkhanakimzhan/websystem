@@ -252,9 +252,6 @@ else {
           <li class="nav-item">
             <a class="nav-link active" data-toggle="tab" href="#nav-graph-network"  color: #000000;">Графовая сеть</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#nav-hierarchical-tree" color: #000000;">Иерархическое древо</a>
-          </li>
         </ul>
       </div>
 
@@ -298,177 +295,6 @@ else {
           </script>
         </div>
         
-        <!-- Древо связей -->
-        <div class="tab-pane fade align-items-center" id="nav-hierarchical-tree">
-          <div id="hierarchical-tree-vis"></div>
-          <?php
-            $nodes['hierarchical-tree'][] = [
-              'id' => $iin,
-              'name' => $FirstName . ' ' . $LastName,
-              'image' => (($Photo=='images/avatars/persons/')?'images/avatars/persons/default_icon.png':$Photo),
-              'href' => 'person-single.php?iin=' . $iin,
-              'label' => '<b>' . $FirstName . ' ' . $LastName . '</b>',
-              'font' => [
-                'multi' =>  "html",
-                'size' =>  20
-              ]
-            ];
-            $edges['hierarchical-tree'] = [];
-            // $father_iin = '0000001';
-
-            // $displayed_idsd['hierarchical-tree'] = array($iin);
-            if($query = $db->prepare("SELECT relative_iin, relative_name, relative_photo, relationship_type 
-            FROM (SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name,
-              b.Photo as relative_photo, relationship_type.Name as relationship_type FROM relatives
-              INNER JOIN persons b ON relatives.relative_iin = b.IIN
-              INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-              WHERE relatives.person_iin =$iin
-              UNION
-              SELECT b.IIN as relative_iin, CONCAT(b.LastName, ' ' ,b.FirstName) as relative_name, b.Photo as relative_photo, relationship_type.Name  as relationship_type FROM relatives
-              INNER JOIN persons b ON relatives.person_iin = b.IIN
-              INNER JOIN relationship_type ON relationship_type.id = relatives.relationship_id
-              WHERE relatives.relative_iin = $iin) as person_relatives 
-            WHERE relative_iin not in ($iin) 
-            GROUP BY person_relatives.relative_iin;")) {
-              $query->execute();
-              $result = $query->get_result();
-              if($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                  if (! empty($row)) {
-                    if (in_array($row['relative_iin'], array($iin))){
-                      continue;
-                    }
-                    $nodes['hierarchical-tree'][] = [
-                      'id' => $row['relative_iin'],
-                      'name' => $row['relative_name'],
-                      'image' => 'images/avatars/persons/' . (($row['relative_photo']=='')?'default_icon.png':$row['relative_photo']),
-                      'href' => 'person-single.php?iin=' . strtolower(str_replace(' ', '', $row['relative_iin'] )),
-                      'label' => $row['relative_name'] ."\n". $row['relative_iin']
-                    ];
-                      
-                    // Определение массива связей между узлами в зависимости от типа отношения
-                    switch ($row['relationship_type']){
-                      case 'Отец':
-                        $edges['hierarchical-tree'][] = [
-                          'from' => $row['relative_iin'],
-                          'to' => $iin,
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => 'Сын'
-                        ];
-                        $father_iin = $row['relative_iin'];
-                        break;
-                      case 'Жена':
-                        $edges['hierarchical-tree'][] = [
-                          'from' => $row['relative_iin'],
-                          'to' => $iin,
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => 'Сын'
-                        ];
-                        
-                        $father_iin = $row['relative_iin'];
-                        break;
-                      case 'Брат':
-                        $edges['hierarchical-tree'][] = [
-                          'from' => $father_iin,
-                          'to' => $row['relative_iin'],
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => 'Сын'
-                        ];
-                        break;
-                      case 'Сестра':
-                        $edges['hierarchical-tree'][] = [
-                          'from' => $father_iin,
-                          'to' => $row['relative_iin'],
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => 'Дочь'
-                        ];
-                        break;
-                      case 'Сын':
-                        $edges['hierarchical-tree'][] = [
-                          'from' => $iin,
-                          'to' => $row['relative_iin'],
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => $row['relationship_type']
-                        ];
-                        break;
-                      case 'Дочь':
-                        $edges['hierarchical-tree'][] = [
-                          'from' => $iin,
-                          'to' => $row['relative_iin'],
-                          'relationship_type' => $row['relationship_type'],
-                          'label' => $row['relationship_type']
-                        ];
-                        break;
-
-                    }
-                  }
-                }
-              }
-            }
-              
-
-            
-            // Преобразование массивов в формат JSON для передачи в JavaScript
-            $nodes_json = json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE);
-            $edges_json = json_encode($edges['hierarchical-tree'], JSON_UNESCAPED_UNICODE);
-
-            // echo json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE);
-          ?>
-
-          <script>
-              var container = document.getElementById('hierarchical-tree-vis');
-
-              var nodes = <?php echo json_encode($nodes['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
-              var edges = <?php echo json_encode($edges['hierarchical-tree'], JSON_UNESCAPED_UNICODE) ?>;
-
-              var options = {
-                layout: {
-                  hierarchical: {
-                    direction: "UD",
-                    sortMethod: "directed",
-                    levelSeparation: 200,
-                    nodeSpacing: 400
-                  }
-                },
-                edges: {
-                  smooth: {
-                    type: 'cubicBezier',
-                    forceDirection: 'horizontal',
-                    roundness: 0.4
-                  }
-                },
-                nodes: {
-                  shape: 'circularImage',
-                  size: 50,
-                  borderWidth: 2,
-                  color: {
-                    border: '#2B7CE9',
-                    background: '#97C2FC',
-                    highlight: {
-                      border: '#2B7CE9',
-                      background: '#D2E5FF'
-                    },
-                    hover: {
-                      border: '#2B7CE9',
-                      background: '#D2E5FF'
-                    }
-                  }
-                },
-    
-              interaction: {
-                hover: true,
-                navigationButtons: true,
-                keyboard: true,
-                zoomView: false // запрещаем масштабирование с помощью мыши
-              },
-            };
-
-              var network = new vis.Network(container, { nodes: nodes, edges: edges }, options);
-
-          </script>
-
-        </div>
-      </div>
     </div>
     
     <hr>
@@ -529,6 +355,7 @@ else {
         $result->free();
         }
       ?>
+      </div>
     </div>
   </div>
   <?php $page = "person_page";

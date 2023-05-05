@@ -1,12 +1,4 @@
 <?php
-// start the session
-// session_start();
-// Check if the user is not logged in, then redirect the user to login page
-if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
-    header("location: login.php");
-    exit;
-}
-//
 require_once "config.php";
 ?>
 
@@ -59,8 +51,9 @@ require_once "config.php";
     1 => 457.19
   ];
 
+  $data = [];
   $displayed_transaction_types = [];
-    if($query = $db->prepare("SELECT Sender, Receiver, Transaction_Type_ID, Transaction_Amount, Transaction_End_Date, Currency_Type
+    if($query = $db->prepare("SELECT Transaction_Start_Date, Sender, Transaction_End_Date, Receiver, Transaction_Type_ID, Transaction_Amount, Currency_Type, Description
       FROM operations
       WHERE Sender = $iin 
       -- OR Receiver = $iin;
@@ -76,17 +69,58 @@ require_once "config.php";
                 $transactions[] = [
                   'name' => $transaction_type[$row["Transaction_Type_ID"]],
                   'color' => $transaction_type_rgb[$row["Transaction_Type_ID"]],
-                  'amount' => $row["Transaction_Amount"]
+                  'amount' => 0,
+                  'data' => []
                 ];
+
+                // $transaction[] = [
+                //   'Transaction_Start_Date' => $row['Transaction_Start_Date'],
+                //   'Sender' => $row['Sender'],
+                //   'Transaction_End_Date' => $row['Transaction_End_Date'],
+                //   'Receiver' => $row['Receiver'],
+                //   'Transaction_Type_ID' => $row['Transaction_Type_ID'],
+                //   'Transaction_Amount' => $row['Transaction_Amount'],
+                //   // 'Currency_Type' => $row['Currency_Type'],
+                //   'Description' => $row['Description'],
+                // ];
+
+                // array_push($transactions['data'], $transaction);
+
               }
               for ($i = 0; $i<count($transactions); $i++){
                 if (isset($transactions[$i]['name']) && $transactions[$i]['name'] == $transaction_type[$row["Transaction_Type_ID"]]){
-                  if (isset($row['Currency_Type']) && $row['Currency_Type'] == 0){
-                    $transactions[$i]['amount'] = $transactions[$i]['amount'] + $row['Transaction_Amount'];
-                  }
-                  if (isset($row['Currency_Type']) && $row['Currency_Type'] == 1){
-                    $transactions[$i]['amount'] = $transactions[$i]['amount'] + ($row['Transaction_Amount'] * $currency_exchange_rate[$row['Currency_Type']]);
+                  // echo $transactions[$i]['name']. ' ' .  $transaction_type[$row["Transaction_Type_ID"]] .'<br>';
 
+                  if ((isset($row['Currency_Type']) && $row['Currency_Type'] == 0) && isset($transaction_type[$row["Transaction_Type_ID"]]) && $transaction_type[$row["Transaction_Type_ID"]] == $transactions[$i]['name']){
+                    $transactions[$i]['amount'] = $transactions[$i]['amount'] + $row['Transaction_Amount'] ;
+                    $data[$row["Transaction_Type_ID"]][] = [
+                      'Transaction_Start_Date' => $row['Transaction_Start_Date'],
+                      'Sender' => $row['Sender'],
+                      'Transaction_End_Date' => $row['Transaction_End_Date'],
+                      'Receiver' => $row['Receiver'],
+                      'Transaction_Type_ID' => $row['Transaction_Type_ID'],
+                      'Transaction_Amount' => $row['Transaction_Amount'],
+                      'Currency_Type' => $row['Currency_Type'],
+                      'Description' => $row['Description'],
+                    ];
+
+                    $transactions[$i]['data'] = $data[$row["Transaction_Type_ID"]];
+                    // $data = [];
+                  };
+                  if (isset($row['Currency_Type']) && $row['Currency_Type'] == 1){
+                    $data[$row["Transaction_Type_ID"]][]  = [
+                      'Transaction_Start_Date' => $row['Transaction_Start_Date'],
+                      'Sender' => $row['Sender'],
+                      'Transaction_End_Date' => $row['Transaction_End_Date'],
+                      'Receiver' => $row['Receiver'],
+                      'Transaction_Type_ID' => $row['Transaction_Type_ID'],
+                      'Transaction_Amount' => $row['Transaction_Amount'],
+                      'Currency_Type' => $row['Currency_Type'],
+                      'Description' => $row['Description'],
+                    ];
+
+                    $transactions[$i]['data'] = $data[$row["Transaction_Type_ID"]];
+                    $transactions[$i]['amount'] = $transactions[$i]['amount'] + ($row['Transaction_Amount']);
                   }
                 }
               }
@@ -99,19 +133,11 @@ require_once "config.php";
         }
       }
 
-      // echo json_encode($treemap, JSON_UNESCAPED_UNICODE);
-      // echo 'C даты: ' . $from . ' По:' . $to;
-
-
 ?>
-<!-- <div class="container rounded bg-white mt-5 mb-5"> -->
-  <!-- <div id='treemap-container'></div> -->
-
-<!-- </div> -->
 
 
 <script>
-    var data = <?php echo json_encode($treemap, JSON_UNESCAPED_UNICODE); ?>
+        var data = <?php echo json_encode($treemap, JSON_UNESCAPED_UNICODE); ?>
     
         const width = 1280;
         const height = 600;
@@ -124,6 +150,8 @@ require_once "config.php";
             .padding(1)
             .round(true);
 
+
+        
         const root = d3.hierarchy(data)
             .sum(d => d.amount)
             // .sort((a, b) => b.value - a.value);
@@ -145,9 +173,15 @@ require_once "config.php";
             .data(root.leaves())
             .join("g")
             .attr("transform", d => `translate(${d.x0},${d.y0})`)
-            .on("click", d => {
-                window.open(d.data.link, "_blank");
+            .on("click", function(d) {
+              // преобразуем объект в строку json
+              const payloadStr = JSON.stringify(d.data.data);
+              // создаем строку url с параметром, содержащим json payload
+              const url = "treemapdata.php?payload=" + encodeURIComponent(payloadStr);
+              // перенаправляем на другую страницу
+              window.location.href = url;
             });
+
 
         cell.append("rect")
             .attr("id", d => d.data.name)
@@ -215,8 +249,4 @@ require_once "config.php";
             .attr("dy", "0.35em")
             .text(d => `${d.name}: ${format(d.amount)} (${((d.amount / root.value) * 100).toFixed(2)}%)`)
             .style("font", "16px sans-serif");
-
-
-        
-
     </script>
