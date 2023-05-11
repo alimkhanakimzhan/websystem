@@ -250,7 +250,7 @@ else {
       <div class="container">
         <ul class="nav nav-tabs justify-content-center mb-3 text-light p-3 rounded">
           <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#nav-graph-network"  color: #000000;">Графовая сеть</a>
+            <a class="nav-link active" data-toggle="tab" href="#nav-graph-network"  color: #000000;>Графовая сеть</a>
           </li>
         </ul>
       </div>
@@ -259,6 +259,20 @@ else {
       <div class="tab-content container">
         <div class="tab-pane fade active show align-items-center" id="nav-graph-network">
           <button class="btn btn-primary" name="searchFurther" id="searchFurther">Найти родственников</button>
+
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio1" value="find" checked>
+            <label class="form-check-label" for="inlineRadio1">Найти новые связи</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio2" value="hide">
+            <label class="form-check-label" for="inlineRadio2">Скрыть человека</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio3" value="option3">
+            <label class="form-check-label" for="inlineRadio3">Idle mode</label>
+          </div>
+
           <div id="graph-network-vis"></div>
           <?php
             $nodes['graph-network'][$iin] = [

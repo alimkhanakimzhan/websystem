@@ -1,7 +1,6 @@
 // Определение функции, которая принимает три параметра nodes, edges и displayed_ids
 function drawGraph(nodes, edges, displayed_ids) {
     var container = document.getElementById('graph-network-vis');
-    // console.log('');
 
     // Код для создания графа с помощью библиотеки Network
     var options = {
@@ -79,7 +78,6 @@ function drawGraph(nodes, edges, displayed_ids) {
             vadjust: 0,
       
           },
-          size: 40,
           length: 400,
       
           smooth: {
@@ -108,13 +106,79 @@ function drawGraph(nodes, edges, displayed_ids) {
 
     var network = new vis.Network(container, { nodes: loaded_nodes, edges: loaded_edges }, options);
     var chosen_node = undefined;
+    var chosen_radio = $('input[name="radioOptions"]:checked').val();
     
+    $('input[type=radio][name=radioOptions]').change(function() {
+      chosen_radio = $('input[name="radioOptions"]:checked').val();
+    });
     
     
     network.on("click", function (obj) {
     chosen_node = this.getNodeAt(obj.pointer.DOM);
+    switch(chosen_radio) {
+      case 'find':
+        if (chosen_node != undefined) {
+          console.log(nodes);
+          $.ajax({
+          type: "POST",
+          url: "load_nodes.php", // Send the AJAX request to the same page
+          dataType: 'json',
+          cache: false,
+          data: {
+              node_id: chosen_node,
+              displayed_ids: displayed_ids,
+              nodes: nodes,
+              edges: edges
+          },
+          success: function(response) {
+              // The AJAX request was successful, do something here if needed
+              // console.log(response.echo); // for debug purposes
+              nodes = Object.assign({}, nodes, response.nodes);
+              edges = Object.assign({}, edges, response.edges);
+              displayed_ids = response.displayed_ids;
+
+              console.log(response.nodes);
+              console.log(response.edges);
+              loaded_nodes.add(Object.values(response.nodes));
+  
+              loaded_edges.add(Object.values(response.edges));
+  
+          },
+          error: function() {
+              // The AJAX request failed, do something here if needed
+              alert("AJAX request failed");
+          }
+          });
+  
+        }
+        break;
+      case 'hide':
+        if (chosen_node != undefined) {
+
+          loaded_nodes.remove(nodes[chosen_node]);
+          console.log(nodes[chosen_node]);
+          delete nodes[chosen_node];
+          for (var i = displayed_ids.length - 1; i >= 0; i--) {
+            if (displayed_ids[i] === chosen_node) {
+              displayed_ids.splice(i, 1);
+            }
+          }
+          console.log(displayed_ids);
+          for (var key in edges) {
+            if (key.startsWith(chosen_node + "-") || key.endsWith("-" + chosen_node) ) {
+              loaded_edges.remove(edges[key]);
+              console.log(edges[key]);
+              delete edges[key];
+            }
+          }
+        }
+        break;
+      case 'idle':
+        break;
+      default:
+        $('#result').text('Please select a fruit.');
+    }
     });
-    
     
     network.on("doubleClick", function (obj) {
     if (this.getNodeAt(obj.pointer.DOM) != undefined) {
@@ -149,8 +213,6 @@ function drawGraph(nodes, edges, displayed_ids) {
             edges = Object.assign({}, edges, response.edges);
             displayed_ids = response.displayed_ids;
             // alert(displayed_ids.length);
-            console.log(edges);
-            console.log(response.edges);
             // loaded_nodes.add(Object.values(Object.assign({}, nodes)));
             // loaded_edges.add();
 
