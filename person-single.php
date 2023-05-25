@@ -265,12 +265,16 @@ else {
             <label class="form-check-label" for="inlineRadio1">Найти новые связи</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio2" value="hide">
-            <label class="form-check-label" for="inlineRadio2">Скрыть человека</label>
+            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio2" value="findAll">
+            <label class="form-check-label" for="inlineRadio2">Найти все связи</label>
           </div>
           <div class="form-check form-check-inline">
-            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio3" value="option3">
-            <label class="form-check-label" for="inlineRadio3">Idle mode</label>
+            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio3" value="hide">
+            <label class="form-check-label" for="inlineRadio3">Скрыть человека</label>
+          </div>
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="radioOptions" id="inlineRadio4" value="idle">
+            <label class="form-check-label" for="inlineRadio4">Idle mode</label>
           </div>
 
           <div id="graph-network-vis"></div>

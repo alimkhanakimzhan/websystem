@@ -1,0 +1,158 @@
+////// Загрузить //////
+LOAD DATA INFILE 'websystem\\csv\\Transaction_codes.csv'
+INTO TABLE transaction_code
+FIELDS TERMINATED BY '\t'
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+////////////////////////
+
+////// Выгрузить ///////
+SELECT IIN 
+INTO OUTFILE "websystem/csv/21.04.2023/IIN.csv"
+FIELDS TERMINATED BY '\t'
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+FROM persons
+////////////////////////
+
+
+LOAD DATA INFILE 'relatives_final_100%.csv'
+INTO TABLE relatives
+FIELDS TERMINATED BY '\t'
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+IGNORE 1 ROWS;
+
+----
+CREATE VIEW founders AS (
+SELECT * FROM `founders` 
+INNER JOIN persons ON persons.IIN = founders.IIN
+);
+----
+SELECT b.IIN_PDL, b.IIN, a.Relationship_Type, CONCAT(a.LastName, ' ', a.FirstName, ' ', a.Patronymic) 
+INTO OUTFILE 'relatives.csv'
+FIELDS TERMINATED BY '\t'
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+FROM mvd a 
+INNER JOIN families b ON CONCAT(b.Last_Name, b.First_Name, b.Patronymic) =CONCAT(a.LastName, a.FirstName, a.Patronymic)
+WHERE a.IIN_PDL= 641020301756
+
+
+SELECT a.IIN as 
+person_IIN, b.IIN as relative_IIN, 
+a.relation FROM `relations` a 
+INNER JOIN persons b ON a.LastName=b.LastName 
+AND a.FirstName=b.FirstName LIMIT 20
+
+
+
+SELECT a.IIN as person_IIN, b.IIN as relative_IIN, a.LastName, a.FirstName,a.Patronymic, a.relation FROM `relations` a LEFT JOIN persons b ON (a.LastName=b.LastName OR a.FirstName=b.FirstName OR a.Patronymic=b.Patronymic) AND (a.LastName=b.LastName AND a.FirstName=b.FirstName) WHERE a.IIN = 850621300012 LIMIT 50
+
+
+
+SELECT a.IIN as person_IIN, c.IIN as relative_IIN, a.LastName, a.FirstName,a.Patronymic, a.relation 
+FROM relations a 
+LEFT JOIN persons b ON CONCAT(a.FirstName, a.LastName, a.Patronymic)=CONCAT(b.FirstName, b.LastName, b.Patronymic) 
+INNER JOIN persons c ON CONCAT(c.FirstName, c.LastName, c.Patronymic)=CONCAT(b.FirstName, b.LastName, b.Patronymic) 
+WHERE a.IIN = 850621300012 LIMIT 50
+
+
+-----------------------------
+CREATE TABLE `sql_extract`.`families` ( `IIN_PDL` VARCHAR(12) NOT NULL , `Family_ID` VARCHAR(255) NOT NULL , `Relationship_Type` VARCHAR(255) NOT NULL , `IIN` VARCHAR(12) NOT NULL , `Last_Name` VARCHAR(255) NOT NULL , `First_Name` VARCHAR(255) NOT NULL , `Patronymic` VARCHAR(255) NOT NULL , `Relationship_Level` INT(12) NOT NULL , `Place_Birth` VARCHAR(255) NOT NULL , `Place_Registration` VARCHAR(255) NOT NULL , `9. PDL_Flag` BOOLEAN NOT NULL , `10. State_Employee_Flag` BOOLEAN NOT NULL , `11. Law_Enforcement_Office_Flag` BOOLEAN NOT NULL ) ENGINE = InnoDB;
+-----------------------------
+CREATE TABLE `csv_extract`.`mvd` ( `IIN_PDL` VARCHAR(12) NOT NULL , `Relationship_Type` VARCHAR(255) NOT NULL , `LastName` VARCHAR(255) NOT NULL , `FirstName` VARCHAR(255) NOT NULL , `Patronymic` VARCHAR(255) NOT NULL , `Date_Birth` DATE NOT NULL ) ENGINE = InnoDB;
+-----------------------------
+
+
+-----------------------------
+SELECT IIN, Last_Name, First_Name, Patronymic, Photo, Place_Birth, Place_Registration, `9. PDL_Flag`, `10. State_Employee_Flag`, `11. Law_Enforcement_Office_Flag` 
+INTO OUTFILE 'persons.csv'
+FIELDS TERMINATED BY '\t'
+ENCLOSED BY ''
+LINES TERMINATED BY '\n'
+FROM `families`
+
+
+-----------------------------
+
+
+540615300015
+
+
+
+
+
+
+SELECT b.IIN_PDL, b.IIN, a.Relationship_Type, CONCAT(a.LastName, ' ', a.FirstName, ' ', a.Patronymic), CONCAT(b.Last_Name, b.First_Name, b.Patronymic)
+
+FROM mvd a
+JOIN families b ON CONCAT(b.Last_Name, b.First_Name) = CONCAT(a.LastName, a.FirstName) AND a.IIN_PDL = b.IIN_PDL
+WHERE b.IIN_PDL = 660525300893 AND CONCAT(a.LastName, a.FirstName) != ''
+
+
+
+
+760801300834
+
+
+UNION
+SELECT t1.relative_iin, t1.person_iin, '1'
+FROM relatives t1
+LEFT JOIN relatives t2 ON t1.relative_iin = t2.person_iin AND t1.person_iin = t2.relative_iin
+WHERE t1.relationship_id = 2 AND t2.person_iin IS NULL
+
+
+НД Налоговый Департамент
+НУ Налоговое Управление
+
+НК МФ РК Налоговый комитет Министерства финансов РК
+--------------------------------------------------------------------
+UPDATE
+    founders
+SET
+    PROCENT = CASE WHEN PROCENT IS NULL THEN NULL WHEN PROCENT = '0' THEN 0 WHEN PROCENT LIKE '%,%' THEN CAST(
+    REPLACE
+        (
+    REPLACE
+        (PROCENT, ',', '.'),
+        '"',
+        ''
+    ) AS FLOAT
+) ELSE CAST(PROCENT AS FLOAT)
+END;
+--------------------------------------------------------------------
+
+CREATE TABLE person_fouding AS
+SELECT CONCAT(persons.LastName, ' ', persons.FirstName, ' ', persons.Patronymic) AS FullName 
+FROM persons
+INNER JOIN founders ON founders.IIN = persons.IIN
+INNER JOIN legal_entities ON legal_entities.Identifier = founders.IDENTIFIER
+
+
+--------------------------------------------------------------------
+
+SELECT persons.IIN, CONCAT(persons.LastName, ' ', persons.FirstName, ' ', persons.Patronymic) AS FullName, founders.IDENTIFIER, legal_entities.Name as entity, founders.PROCENT
+FROM persons
+INNER JOIN founders ON founders.IIN = persons.IIN
+INNER JOIN legal_entities ON legal_entities.Identifier = founders.IDENTIFIER
+
+
+
+INSERT INTO `relationship_type`(`id`, `Name`, `priority`) VALUES (0,'Не известно',0),
+(1,'ДЕТИ',1),
+(2,'МАТЬ',2),
+(3,'ОТЕЦ',3),
+(4,'БРАТ',4),
+(5,'СЕСТРА',5),
+(6,'НЕ ЖЕНАТ',6),
+(7,'В БРАКЕ',7),
+(8,'РАЗВОД',8),
+
+(9,'ВДОВЕЦ',9),
+(10,'СЫН',10),
+(11,'ДОЧЬ',11),
+
+(15,'РОДИТЕЛЬ',15),
+(16,'РОДСТВЕННИК',16),
